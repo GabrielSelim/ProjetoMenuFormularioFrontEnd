@@ -109,20 +109,62 @@ const MenuManager = () => {
   
   const availableIcons = [
     { value: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { value: 'home', label: 'Início', icon: '🏠' },
     { value: 'description', label: 'Formulário', icon: '📝' },
-    { value: 'settings', label: 'Configurações', icon: '⚙️' },
+    { value: 'assignment', label: 'Tarefas', icon: '📋' },
     { value: 'people', label: 'Pessoas', icon: '👥' },
+    { value: 'person', label: 'Usuário', icon: '👤' },
+    { value: 'group', label: 'Grupo', icon: '👥' },
+    { value: 'settings', label: 'Configurações', icon: '⚙️' },
+    { value: 'admin_panel_settings', label: 'Admin', icon: '�' },
     { value: 'folder', label: 'Pasta', icon: '📁' },
     { value: 'file', label: 'Arquivo', icon: '📄' },
     { value: 'link', label: 'Link', icon: '🔗' },
-    { value: 'build', label: 'Construtor', icon: '🔧' },
+    { value: 'build', label: 'Construtor', icon: '�' },
     { value: 'contact_mail', label: 'Contato', icon: '📧' },
-    { value: 'assignment', label: 'Tarefa', icon: '📋' },
+    { value: 'mail', label: 'Email', icon: '✉️' },
     { value: 'feedback', label: 'Feedback', icon: '💬' },
+    { value: 'chat', label: 'Chat', icon: '💭' },
     { value: 'quiz', label: 'Quiz', icon: '❓' },
-    { value: 'home', label: 'Início', icon: '🏠' },
+    { value: 'help', label: 'Ajuda', icon: '❓' },
     { value: 'info', label: 'Informação', icon: 'ℹ️' },
-    { value: 'help', label: 'Ajuda', icon: '❓' }
+    { value: 'announcement', label: 'Anúncio', icon: '📢' },
+    { value: 'event', label: 'Evento', icon: '📅' },
+    { value: 'calendar_today', label: 'Calendário', icon: '📆' },
+    { value: 'schedule', label: 'Agenda', icon: '🗓️' },
+    { value: 'bar_chart', label: 'Relatórios', icon: '📈' },
+    { value: 'analytics', label: 'Analytics', icon: '📊' },
+    { value: 'trending_up', label: 'Crescimento', icon: '📈' },
+    { value: 'account_balance', label: 'Financeiro', icon: '🏦' },
+    { value: 'payment', label: 'Pagamentos', icon: '💳' },
+    { value: 'shopping_cart', label: 'Carrinho', icon: '🛒' },
+    { value: 'inventory', label: 'Estoque', icon: '📦' },
+    { value: 'local_shipping', label: 'Envio', icon: '🚚' },
+    { value: 'store', label: 'Loja', icon: '🏪' },
+    { value: 'business', label: 'Negócios', icon: '�' },
+    { value: 'work', label: 'Trabalho', icon: '💼' },
+    { value: 'school', label: 'Educação', icon: '🎓' },
+    { value: 'book', label: 'Livro', icon: '📚' },
+    { value: 'library_books', label: 'Biblioteca', icon: '📖' },
+    { value: 'security', label: 'Segurança', icon: '🔒' },
+    { value: 'vpn_key', label: 'Chave', icon: '🔑' },
+    { value: 'lock', label: 'Bloqueio', icon: '🔐' },
+    { value: 'notifications', label: 'Notificações', icon: '🔔' },
+    { value: 'star', label: 'Favorito', icon: '⭐' },
+    { value: 'favorite', label: 'Curtir', icon: '❤️' },
+    { value: 'thumb_up', label: 'Aprovar', icon: '👍' },
+    { value: 'search', label: 'Buscar', icon: '🔍' },
+    { value: 'filter_list', label: 'Filtros', icon: '🔽' },
+    { value: 'sort', label: 'Ordenar', icon: '🔀' },
+    { value: 'download', label: 'Download', icon: '⬇️' },
+    { value: 'upload', label: 'Upload', icon: '⬆️' },
+    { value: 'cloud', label: 'Nuvem', icon: '☁️' },
+    { value: 'wifi', label: 'WiFi', icon: '📶' },
+    { value: 'devices', label: 'Dispositivos', icon: '📱' },
+    { value: 'computer', label: 'Computador', icon: '💻' },
+    { value: 'phone', label: 'Telefone', icon: '📞' },
+    { value: 'location_on', label: 'Localização', icon: '📍' },
+    { value: 'map', label: 'Mapa', icon: '🗺️' }
   ];
 
   const handleOpenDialog = (menu = null) => {
@@ -501,7 +543,7 @@ const MenuManager = () => {
           </Paper>
 
           {/* Dialog para criar/editar menu */}
-          <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+          <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
             <DialogTitle>
               {editingMenu ? 'Editar Menu' : 'Adicionar Menu'}
             </DialogTitle>
@@ -522,58 +564,60 @@ const MenuManager = () => {
                 sx={{ mb: 2 }}
               />
               
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid item xs={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Tipo de Conteúdo</InputLabel>
-                    <Select
-                      value={formData.contentType}
-                      label="Tipo de Conteúdo"
-                      onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
-                    >
-                      {menuTypes.map(type => (
-                        <MenuItem key={type.value} value={type.value}>
-                          {type.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Ícone</InputLabel>
-                    <Select
-                      value={formData.icon}
-                      label="Ícone"
-                      onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                      renderValue={(selected) => {
-                        const icon = availableIcons.find(i => i.value === selected);
-                        return (
-                          <Box display="flex" alignItems="center" gap={1}>
-                            {icon && <span style={{ fontSize: '20px' }}>{icon.icon}</span>}
-                            {icon?.label || 'Nenhum'}
-                          </Box>
-                        );
-                      }}
-                    >
-                      <MenuItem value="">
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <span style={{ fontSize: '20px' }}>❌</span>
-                          Nenhum
-                        </Box>
-                      </MenuItem>
-                      {availableIcons.map(icon => (
-                        <MenuItem key={icon.value} value={icon.value}>
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <span style={{ fontSize: '20px' }}>{icon.icon}</span>
-                            {icon.label}
-                          </Box>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Tipo de Conteúdo</InputLabel>
+                <Select
+                  value={formData.contentType}
+                  label="Tipo de Conteúdo"
+                  onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
+                >
+                  {menuTypes.map(type => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Ícone</InputLabel>
+                <Select
+                  value={formData.icon}
+                  label="Ícone"
+                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  renderValue={(selected) => {
+                    const icon = availableIcons.find(i => i.value === selected);
+                    return (
+                      <Box display="flex" alignItems="center" gap={1}>
+                        {icon && <span style={{ fontSize: '24px' }}>{icon.icon}</span>}
+                        <Typography variant="body1">{icon?.label || 'Nenhum'}</Typography>
+                      </Box>
+                    );
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 400,
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="">
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <span style={{ fontSize: '24px' }}>❌</span>
+                      <Typography>Nenhum</Typography>
+                    </Box>
+                  </MenuItem>
+                  {availableIcons.map(icon => (
+                    <MenuItem key={icon.value} value={icon.value}>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <span style={{ fontSize: '24px' }}>{icon.icon}</span>
+                        <Typography>{icon.label}</Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               
               {/* Campo dinâmico baseado no tipo de conteúdo */}
               {formData.contentType === 'form' ? (
@@ -627,90 +671,118 @@ const MenuManager = () => {
               )}
               
               <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Roles Permitidos</InputLabel>
+                <InputLabel>Permissões de Acesso</InputLabel>
                 <Select
                   multiple
                   value={formData.rolesAllowed ? formData.rolesAllowed.split(',').map(r => r.trim()) : []}
-                  label="Roles Permitidos"
+                  label="Permissões de Acesso"
                   onChange={(e) => setFormData({ 
                     ...formData, 
                     rolesAllowed: Array.isArray(e.target.value) ? e.target.value.join(',') : e.target.value 
                   })}
                   renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value) => {
-                        const role = availableRoles.find(r => r.value === value);
-                        return (
-                          <Chip
-                            key={value}
-                            label={role?.label || value}
-                            size="small"
-                            color={role?.color || 'default'}
-                          />
-                        );
-                      })}
+                      {selected.length === 0 ? (
+                        <Typography variant="body2" color="text.secondary">
+                          Selecione as permissões...
+                        </Typography>
+                      ) : (
+                        selected.map((value) => {
+                          const role = availableRoles.find(r => r.value === value);
+                          return (
+                            <Chip
+                              key={value}
+                              label={role?.label || value}
+                              size="small"
+                              color={role?.color || 'default'}
+                              variant="filled"
+                            />
+                          );
+                        })
+                      )}
                     </Box>
                   )}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300,
+                      },
+                    },
+                  }}
                 >
                   {availableRoles.map((role) => (
                     <MenuItem key={role.value} value={role.value}>
-                      <Chip
-                        label={role.label}
-                        size="small"
-                        color={role.color}
-                        variant="outlined"
-                      />
+                      <Box display="flex" alignItems="center" gap={1} width="100%">
+                        <Chip
+                          label={role.label}
+                          size="small"
+                          color={role.color}
+                          variant="outlined"
+                        />
+                        <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+                          {role.description || ''}
+                        </Typography>
+                      </Box>
                     </MenuItem>
                   ))}
                 </Select>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                  💡 Selecione quais tipos de usuário podem ver este menu
+                </Typography>
               </FormControl>
               
-              <TextField
-                margin="dense"
-                label="Ordem de Exibição"
-                type="number"
-                fullWidth
-                variant="outlined"
-                value={formData.order}
-                onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                sx={{ mb: 2 }}
-              />
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    margin="dense"
+                    label="Ordem de Exibição"
+                    type="number"
+                    fullWidth
+                    variant="outlined"
+                    value={formData.order}
+                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                    helperText="Ordem numérica para organização no menu"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box display="flex" alignItems="center" gap={2} sx={{ mt: 2 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={formData.isActive}
+                          onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                          color="primary"
+                        />
+                      }
+                      label="Menu Ativo"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={formData.isVisible}
+                          onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                          color="primary"
+                        />
+                      }
+                      label="Visível na Sidebar"
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
               
               <TextField
                 margin="dense"
                 label="Descrição (opcional)"
                 fullWidth
                 multiline
-                rows={2}
+                rows={3}
                 variant="outlined"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 sx={{ mb: 2 }}
-                placeholder="Descrição do menu para documentação"
+                placeholder="Descrição do menu para documentação interna..."
+                helperText="Esta descrição é apenas para organização interna"
               />
-              
-              <Box display="flex" gap={2} sx={{ mb: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                      color="primary"
-                    />
-                  }
-                  label="Ativo"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isVisible}
-                      onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                      color="primary"
-                    />
-                  }
-                  label="Visível na Sidebar"
-                />
-              </Box>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseDialog}>Cancelar</Button>
