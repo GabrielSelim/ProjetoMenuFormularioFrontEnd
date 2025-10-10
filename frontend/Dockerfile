@@ -3,16 +3,20 @@ FROM node:20-alpine as build
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (better cache)
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci
+# Install dependencies
+RUN npm ci --omit=dev --prefer-offline --no-audit
+
+# Install dev dependencies needed for build
+RUN npm install --save-dev typescript @types/react @types/react-dom @vitejs/plugin-react vite terser
 
 # Copy source code
 COPY . .
 
-# Build the application
+# Build
+ENV NODE_ENV=production
 RUN npm run build
 
 # Production stage

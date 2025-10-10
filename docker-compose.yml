@@ -1,29 +1,11 @@
-version: '3.8'
-
-# Nome específico do projeto para evitar conflitos
-name: formsmenu-frontend-project
-
 services:
   formsmenu-frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: formsmenu-frontend-app
+    container_name: formsmenu-frontend
     ports:
       - "3001:80"
     environment:
       - NODE_ENV=production
     restart: unless-stopped
-    networks:
-      - formsmenu-frontend-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.formsmenu-frontend.rule=Host(`formsmenu.gabrielsanztech.com.br`)"
-      - "traefik.http.routers.formsmenu-frontend.entrypoints=websecure"
-      - "traefik.http.routers.formsmenu-frontend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.formsmenu-frontend.loadbalancer.server.port=80"
-
-networks:
-  formsmenu-frontend-network:
-    driver: bridge
-    name: formsmenu-frontend-net
