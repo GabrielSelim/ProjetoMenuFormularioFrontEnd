@@ -51,21 +51,43 @@ O domínio `formsmenu.gabrielsanztech.com.br` deve estar configurado no seu DNS 
 Execute o script de deploy:
 
 ```bash
+# Linux/Mac
 chmod +x deploy.sh
 ./deploy.sh
+
+# Windows
+deploy.bat
 ```
 
 ### Opção 2: Deploy Manual
 
 ```bash
-# 1. Build da imagem
-docker-compose build
+# 1. Build da imagem (com nome específico do projeto)
+docker-compose -p formsmenu-frontend-project build
 
 # 2. Subir os containers
-docker-compose up -d
+docker-compose -p formsmenu-frontend-project up -d
 
 # 3. Verificar status
-docker-compose ps
+docker-compose -p formsmenu-frontend-project ps
+```
+
+### � Gerenciamento Seguro do Container
+
+Para gerenciar apenas o container do FormEngine (sem afetar outros):
+
+```bash
+# Linux/Mac
+chmod +x manage-frontend.sh
+./manage-frontend.sh {start|stop|restart|logs|status|health}
+
+# Windows  
+manage-frontend.bat {start|stop|restart|logs|status|health}
+
+# Exemplos:
+./manage-frontend.sh status    # Ver status
+./manage-frontend.sh logs      # Ver logs
+./manage-frontend.sh restart   # Reiniciar
 ```
 
 ## 🔍 Verificação

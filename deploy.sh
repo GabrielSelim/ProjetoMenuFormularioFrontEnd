@@ -1,6 +1,10 @@
 #!/bin/bash
 
 # Script para build e deploy do frontend FormEngine
+# Usa nome específico do projeto para evitar conflitos com outros containers
+
+PROJECT_NAME="formsmenu-frontend-project"
+CONTAINER_NAME="formsmenu-frontend-app"
 
 echo "🚀 Iniciando build e deploy do frontend FormEngine..."
 
@@ -29,17 +33,29 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Parar e remover containers existentes
-log_info "Parando containers existentes..."
-docker-compose down
+# Parar e remover APENAS o container específico do FormEngine
+log_info "Verificando container existente: $CONTAINER_NAME"
+if docker ps -a --format "table {{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
+    log_info "Parando e removendo container antigo: $CONTAINER_NAME"
+    docker stop $CONTAINER_NAME 2>/dev/null || true
+    docker rm $CONTAINER_NAME 2>/dev/null || true
+else
+    log_info "Nenhum container anterior encontrado."
+fi
 
-# Limpar imagens antigas (opcional)
-log_info "Removendo imagens antigas..."
-docker image prune -f
+# Remover apenas a rede específica se existir
+if docker network ls --format "table {{.Name}}" | grep -q "^formsmenu-frontend-net$"; then
+    log_info "Removendo rede específica: formsmenu-frontend-net"
+    docker network rm formsmenu-frontend-net 2>/dev/null || true
+fi
+
+# Limpar apenas imagens sem tag deste projeto (mais seguro)
+log_info "Limpando imagens não utilizadas do projeto..."
+docker images --filter "dangling=true" -q --no-trunc | head -5 | xargs -r docker rmi 2>/dev/null || true
 
 # Build da nova imagem
 log_info "Construindo nova imagem..."
-docker-compose build --no-cache
+docker-compose -p $PROJECT_NAME build --no-cache
 
 # Verificar se o build foi bem-sucedido
 if [ $? -eq 0 ]; then
@@ -51,16 +67,19 @@ fi
 
 # Deploy da aplicação
 log_info "Fazendo deploy da aplicação..."
-docker-compose up -d
+docker-compose -p $PROJECT_NAME up -d
 
 # Verificar se os containers estão rodando
 sleep 5
-if docker-compose ps | grep -q "Up"; then
+if docker-compose -p $PROJECT_NAME ps | grep -q "Up"; then
     log_info "✅ Deploy concluído com sucesso!"
-    log_info "🌐 Frontend disponível em: http://formsmenu.gabrielsanztech.com.br"
-    log_info "📊 Para ver os logs: docker-compose logs -f"
-    log_info "🔧 Para parar: docker-compose down"
+    log_info "🌐 Frontend local: http://localhost:3001"
+    log_info "🌐 Frontend produção: http://formsmenu.gabrielsanztech.com.br"
+    log_info "📊 Para ver os logs: docker-compose -p $PROJECT_NAME logs -f"
+    log_info "🔧 Para parar: docker-compose -p $PROJECT_NAME down"
+    log_info "🐳 Container: $CONTAINER_NAME"
+    log_info "🔍 Health check: curl http://localhost:3001/health"
 else
     log_error "❌ Falha no deploy. Verificando logs..."
-    docker-compose logs
+    docker-compose -p $PROJECT_NAME logs
 fi
