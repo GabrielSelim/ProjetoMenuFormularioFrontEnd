@@ -35,7 +35,7 @@ export const formService = {
         throw { message: 'Dados inválidos. Verifique se todos os campos obrigatórios estão preenchidos.' };
       }
       if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
-        throw { message: 'API não está disponível. Verifique se o servidor backend está rodando em http://localhost:5000' };
+        throw { message: 'API não está disponível. Verifique a conexão com https://formsmenuapi.gabrielsanztech.com.br' };
       }
       throw error.response?.data || { message: 'Erro ao criar formulário' };
     }
