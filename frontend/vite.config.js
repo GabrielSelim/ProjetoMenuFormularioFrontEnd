@@ -24,7 +24,7 @@ export default defineConfig({
           'router': ['react-router-dom'],
           'http': ['axios'],
           'form': ['react-hook-form', '@hookform/resolvers'],
-          'utils': ['react-beautiful-dnd', '@tanstack/react-query']
+          'utils': ['@hello-pangea/dnd', '@tanstack/react-query']
         }
       }
     },

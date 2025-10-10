@@ -29,7 +29,7 @@ import {
   Save,
   DragIndicator
 } from '@mui/icons-material';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { formService } from '../api/formService';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
@@ -150,9 +150,9 @@ const FormBuilderPage = () => {
 
       await formService.createForm({
         name: formSchema.title,
-        description: formSchema.description,
-        schema: formSchema,
-        isActive: true
+        schemaJson: JSON.stringify(formSchema),
+        rolesAllowed: 'all',
+        version: '1.0'
       });
 
       setSuccess('Formulário salvo com sucesso!');

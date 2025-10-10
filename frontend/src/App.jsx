@@ -17,6 +17,7 @@ import Dashboard from './pages/Dashboard';
 import MenuManager from './pages/MenuManager';
 import MenuManagerSimple from './pages/MenuManagerSimple';
 import TestPage from './pages/TestPage';
+import TestAPI from './pages/TestAPI';
 import FormBuilderPage from './pages/FormBuilderPage';
 import FormList from './pages/FormList';
 import FormView from './pages/FormView';
@@ -176,6 +177,16 @@ function App() {
                 <Route 
                   path="/test" 
                   element={<TestPage />} 
+                />
+                
+                <Route 
+                  path="/test-api" 
+                  element={<TestAPI />} 
+                />
+                
+                <Route 
+                  path="/debug-form/:id" 
+                  element={<FormView />} 
                 />
                 
                 {/* Rotas de administração */}

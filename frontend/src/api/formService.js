@@ -7,6 +7,7 @@ export const formService = {
       const response = await api.get('/Forms');
       return response.data;
     } catch (error) {
+      console.error('Erro ao buscar formulários:', error);
       throw error.response?.data || { message: 'Erro ao buscar formulários' };
     }
   },
@@ -17,6 +18,7 @@ export const formService = {
       const response = await api.get(`/Forms/${id}`);
       return response.data;
     } catch (error) {
+      console.error('Erro ao buscar formulário:', error);
       throw error.response?.data || { message: 'Erro ao buscar formulário' };
     }
   },
@@ -24,9 +26,17 @@ export const formService = {
   // Cria um novo formulário
   createForm: async (formData) => {
     try {
+      console.log('Enviando dados do formulário:', formData);
       const response = await api.post('/Forms', formData);
       return response.data;
     } catch (error) {
+      console.error('Erro ao criar formulário:', error.response?.data || error.message);
+      if (error.response?.status === 400) {
+        throw { message: 'Dados inválidos. Verifique se todos os campos obrigatórios estão preenchidos.' };
+      }
+      if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
+        throw { message: 'API não está disponível. Verifique se o servidor backend está rodando em http://localhost:5000' };
+      }
       throw error.response?.data || { message: 'Erro ao criar formulário' };
     }
   },
@@ -60,6 +70,7 @@ export const formService = {
       });
       return response.data;
     } catch (error) {
+      console.error('Erro ao submeter formulário:', error);
       throw error.response?.data || { message: 'Erro ao submeter formulário' };
     }
   },

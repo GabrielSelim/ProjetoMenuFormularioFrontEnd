@@ -63,9 +63,29 @@ const FormList = () => {
     try {
       setLoading(true);
       setError('');
+      console.log('Carregando lista de formulários...');
       const formsData = await formService.getForms();
-      setForms(formsData || []);
+      console.log('Formulários recebidos:', formsData);
+      
+      // Processa os formulários para incluir schema parseado
+      const processedForms = (formsData || []).map(form => {
+        let processedForm = { ...form };
+        if (form.schemaJson && typeof form.schemaJson === 'string') {
+          try {
+            processedForm.schema = JSON.parse(form.schemaJson);
+          } catch (parseError) {
+            console.warn('Erro ao parsear schema do formulário', form.id, parseError);
+            processedForm.schema = null;
+          }
+        } else if (form.schemaJson && typeof form.schemaJson === 'object') {
+          processedForm.schema = form.schemaJson;
+        }
+        return processedForm;
+      });
+      
+      setForms(processedForms);
     } catch (err) {
+      console.error('Erro ao carregar formulários:', err);
       setError(err.message || 'Erro ao carregar formulários');
     } finally {
       setLoading(false);
@@ -85,10 +105,28 @@ const FormList = () => {
 
   const handlePreview = async (form) => {
     try {
+      console.log('Carregando preview do formulário:', form.id);
       const formData = await formService.getFormById(form.id);
-      setPreviewForm(formData);
+      console.log('Dados do formulário para preview:', formData);
+      
+      // Parse do schema se necessário
+      let processedForm = { ...formData };
+      if (formData.schemaJson && typeof formData.schemaJson === 'string') {
+        try {
+          processedForm.schema = JSON.parse(formData.schemaJson);
+          console.log('Schema parseado para preview:', processedForm.schema);
+        } catch (parseError) {
+          console.error('Erro ao parsear schema para preview:', parseError);
+          processedForm.schema = null;
+        }
+      } else if (formData.schemaJson && typeof formData.schemaJson === 'object') {
+        processedForm.schema = formData.schemaJson;
+      }
+      
+      setPreviewForm(processedForm);
       setPreviewOpen(true);
     } catch (err) {
+      console.error('Erro ao carregar formulário para preview:', err);
       setError(err.message || 'Erro ao carregar formulário para preview');
     }
   };
@@ -98,6 +136,8 @@ const FormList = () => {
   };
 
   const handleView = (formId) => {
+    console.log('🔍 Clicou em Visualizar formulário ID:', formId);
+    console.log('🚀 Navegando para:', `/forms/${formId}`);
     navigate(`/forms/${formId}`);
   };
 

@@ -38,7 +38,7 @@ const Header = () => {
     }}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-          Sistema de Formulários
+          Sistema de Formulários Sanz Tech
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>

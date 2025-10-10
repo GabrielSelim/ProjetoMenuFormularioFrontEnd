@@ -33,9 +33,28 @@ import { useAuth } from '../context/AuthContext';
 
 const drawerWidth = 260;
 
-// Ícones para diferentes tipos de menu
+// Ícones para diferentes tipos de menu com emojis
 const getMenuIcon = (iconName, type) => {
-  const iconMap = {
+  const emojiIcons = {
+    dashboard: '📊',
+    description: '📝',
+    settings: '⚙️',
+    people: '👥',
+    menu: '📋',
+    folder: '📁',
+    file: '📄',
+    link: '🔗',
+    build: '🔧',
+    contact_mail: '📧',
+    assignment: '📋',
+    feedback: '💬',
+    quiz: '❓',
+    home: '🏠',
+    info: 'ℹ️',
+    help: '❓'
+  };
+
+  const materialIcons = {
     dashboard: <Dashboard />,
     description: <Description />,
     settings: <Settings />,
@@ -47,7 +66,13 @@ const getMenuIcon = (iconName, type) => {
     build: <Build />,
   };
 
-  return iconMap[iconName?.toLowerCase()] || iconMap[type?.toLowerCase()] || <InsertDriveFile />;
+  // Prioriza emoji se disponível, senão usa Material UI
+  const emoji = emojiIcons[iconName?.toLowerCase()];
+  if (emoji) {
+    return <span style={{ fontSize: '20px' }}>{emoji}</span>;
+  }
+
+  return materialIcons[iconName?.toLowerCase()] || materialIcons[type?.toLowerCase()] || <InsertDriveFile />;
 };
 
 const Sidebar = () => {
@@ -72,12 +97,17 @@ const Sidebar = () => {
 
   const handleNavigation = (menu) => {
     const menuType = menu.contentType?.toLowerCase();
+    console.log('🔗 Navegando via menu:', menu.name, 'Tipo:', menuType, 'URL/Path:', menu.urlOrPath);
+    
     switch (menuType) {
       case 'route':
       case 'page':
         navigate(menu.urlOrPath || '/');
         break;
       case 'form':
+      case 'formulario':
+        // Para menus do tipo formulário, navega diretamente para /forms/{formId}
+        console.log('📝 Abrindo formulário via menu, ID:', menu.urlOrPath);
         navigate(`/forms/${menu.urlOrPath}`);
         break;
       case 'iframe':

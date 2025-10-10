@@ -4,18 +4,24 @@ export const menuService = {
   // Busca todos os menus
   getMenus: async () => {
     try {
+      console.log('🔍 Buscando todos os menus...');
       const response = await api.get('/Menus');
-      return response.data;
+      const menus = Array.isArray(response.data) ? response.data : [];
+      console.log('✅ Menus encontrados:', menus.length);
+      return menus;
     } catch (error) {
-      throw error.response?.data || { message: 'Erro ao buscar menus' };
+      console.error('❌ Erro ao buscar menus:', error);
+      // Retorna array vazio em vez de throw para evitar crashes
+      return [];
     }
   },
 
   // Busca menus filtrados por role do usuário (filtrado no frontend)
   getMenusByRole: async (role) => {
     try {
+      console.log('🔍 Buscando menus para role:', role);
       const response = await api.get('/Menus');
-      const allMenus = response.data;
+      const allMenus = Array.isArray(response.data) ? response.data : [];
       
       // Filtra menus baseado no role do usuário
       const filteredMenus = allMenus.filter(menu => {
@@ -24,9 +30,12 @@ export const menuService = {
         return allowedRoles.includes(role.toLowerCase()) || allowedRoles.includes('all');
       });
       
+      console.log('✅ Menus filtrados:', filteredMenus.length);
       return filteredMenus;
     } catch (error) {
-      throw error.response?.data || { message: 'Erro ao buscar menus por role' };
+      console.error('❌ Erro ao buscar menus por role:', error);
+      // Retorna array vazio em vez de throw para evitar crashes
+      return [];
     }
   },
 
@@ -63,14 +72,29 @@ export const menuService = {
   // Reordena os menus (atualiza a ordem de cada menu individualmente)
   reorderMenus: async (reorderedMenus) => {
     try {
+      console.log('🔄 Reordenando menus:', reorderedMenus.map(m => ({ id: m.id, name: m.name, newOrder: reorderedMenus.indexOf(m) + 1 })));
+      
       const updatePromises = reorderedMenus.map((menu, index) => {
-        const updatedMenu = { ...menu, order: index + 1 };
-        return api.put(`/Menus/${menu.id}`, updatedMenu);
+        // Envia apenas os campos necessários para a API
+        const updateData = {
+          name: menu.name,
+          contentType: menu.contentType,
+          urlOrPath: menu.urlOrPath,
+          rolesAllowed: menu.rolesAllowed,
+          order: index + 1,
+          icon: menu.icon,
+          parentId: menu.parentId
+        };
+        
+        console.log(`📝 Atualizando menu ${menu.id} com ordem ${index + 1}`);
+        return api.put(`/Menus/${menu.id}`, updateData);
       });
       
       await Promise.all(updatePromises);
+      console.log('✅ Reordenação concluída com sucesso');
       return { success: true };
     } catch (error) {
+      console.error('❌ Erro ao reordenar menus:', error);
       throw error.response?.data || { message: 'Erro ao reordenar menus' };
     }
   },

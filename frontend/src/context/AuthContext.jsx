@@ -26,30 +26,9 @@ export const AuthProvider = ({ children }) => {
         
         if (isAuthenticated && currentUser) {
           setUser(currentUser);
-        } else {
-          // Para testes - cria um usuário admin temporário
-          const tempUser = {
-            id: 1,
-            name: 'Admin',
-            email: 'admin@test.com',
-            role: 'admin'
-          };
-          setUser(tempUser);
-          localStorage.setItem('user', JSON.stringify(tempUser));
-          localStorage.setItem('token', 'temp-token-for-testing');
         }
       } catch (error) {
         console.error('Erro ao inicializar autenticação:', error);
-        // Para testes - cria um usuário admin temporário
-        const tempUser = {
-          id: 1,
-          name: 'Admin',
-          email: 'admin@test.com',
-          role: 'admin'
-        };
-        setUser(tempUser);
-        localStorage.setItem('user', JSON.stringify(tempUser));
-        localStorage.setItem('token', 'temp-token-for-testing');
       } finally {
         setLoading(false);
       }

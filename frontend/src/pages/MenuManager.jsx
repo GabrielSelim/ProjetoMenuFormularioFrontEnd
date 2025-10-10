@@ -35,8 +35,9 @@ import {
   Visibility,
   VisibilityOff
 } from '@mui/icons-material';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useMenu } from '../context/MenuContext';
+import { formService } from '../api/formService';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 
@@ -44,6 +45,8 @@ const MenuManager = () => {
   const { menus, loadAllMenus, createMenu, updateMenu, deleteMenu, reorderMenus, loading } = useMenu();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
+  const [availableForms, setAvailableForms] = useState([]);
+  const [loadingForms, setLoadingForms] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     icon: '',
@@ -59,8 +62,33 @@ const MenuManager = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadAllMenus();
+    const initializeData = async () => {
+      try {
+        console.log('🚀 Inicializando MenuManager...');
+        await loadAllMenus();
+        await loadAvailableForms();
+        console.log('✅ MenuManager inicializado com sucesso');
+      } catch (err) {
+        console.error('❌ Erro ao inicializar MenuManager:', err);
+        setError('Erro ao carregar dados iniciais');
+      }
+    };
+
+    initializeData();
   }, []);
+
+  const loadAvailableForms = async () => {
+    try {
+      setLoadingForms(true);
+      const forms = await formService.getForms();
+      setAvailableForms(forms || []);
+    } catch (err) {
+      console.warn('Erro ao carregar formulários para menus:', err);
+      setAvailableForms([]);
+    } finally {
+      setLoadingForms(false);
+    }
+  };
 
   const menuTypes = [
     { value: 'route', label: 'Rota Interna' },
@@ -71,8 +99,31 @@ const MenuManager = () => {
     { value: 'page', label: 'Página' }
   ];
 
-  const availableRoles = ['admin', 'manager', 'user', 'all'];
-  const availableIcons = ['dashboard', 'description', 'settings', 'people', 'folder', 'file', 'link', 'build'];
+  const availableRoles = [
+    { value: 'all', label: 'Todos os Usuários', color: 'primary' },
+    { value: 'admin', label: 'Administradores', color: 'error' },
+    { value: 'manager', label: 'Gerentes', color: 'warning' },
+    { value: 'user', label: 'Usuários', color: 'info' },
+    { value: 'guest', label: 'Visitantes', color: 'default' }
+  ];
+  
+  const availableIcons = [
+    { value: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { value: 'description', label: 'Formulário', icon: '📝' },
+    { value: 'settings', label: 'Configurações', icon: '⚙️' },
+    { value: 'people', label: 'Pessoas', icon: '👥' },
+    { value: 'folder', label: 'Pasta', icon: '📁' },
+    { value: 'file', label: 'Arquivo', icon: '📄' },
+    { value: 'link', label: 'Link', icon: '🔗' },
+    { value: 'build', label: 'Construtor', icon: '🔧' },
+    { value: 'contact_mail', label: 'Contato', icon: '📧' },
+    { value: 'assignment', label: 'Tarefa', icon: '📋' },
+    { value: 'feedback', label: 'Feedback', icon: '💬' },
+    { value: 'quiz', label: 'Quiz', icon: '❓' },
+    { value: 'home', label: 'Início', icon: '🏠' },
+    { value: 'info', label: 'Informação', icon: 'ℹ️' },
+    { value: 'help', label: 'Ajuda', icon: '❓' }
+  ];
 
   const handleOpenDialog = (menu = null) => {
     if (menu) {
@@ -162,14 +213,25 @@ const MenuManager = () => {
   const handleDragEnd = async (result) => {
     if (!result.destination) return;
 
+    // Atualiza otimisticamente a UI
     const items = Array.from(menus);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
     try {
+      // Reordena no servidor
       await reorderMenus(items);
+      
+      // Recarrega os menus para garantir sincronização
+      await loadAllMenus();
+      
+      console.log('✅ Menus reordenados e recarregados com sucesso');
     } catch (err) {
+      console.error('❌ Erro ao reordenar menus:', err);
       setError(err.message || 'Erro ao reordenar menus');
+      
+      // Em caso de erro, recarrega os menus para restaurar a ordem original
+      await loadAllMenus();
     }
   };
 
@@ -177,6 +239,68 @@ const MenuManager = () => {
     const typeObj = menuTypes.find(t => t.value === contentType);
     return typeObj ? typeObj.label : contentType;
   };
+
+  const getMenuDescription = (menu) => {
+    if (menu.contentType === 'form') {
+      const form = availableForms.find(f => f.id.toString() === menu.urlOrPath);
+      if (form) {
+        return form.name;
+      }
+      return `Formulário ${menu.urlOrPath}`;
+    }
+    return menu.urlOrPath || '-';
+  };
+
+  const createQuickFormMenu = () => {
+    if (availableForms.length === 0) return;
+    
+    const firstForm = availableForms[0];
+    setEditingMenu(null);
+    setFormData({
+      name: `Menu: ${firstForm.name}`,
+      icon: 'description',
+      contentType: 'form',
+      urlOrPath: firstForm.id.toString(),
+      rolesAllowed: 'all',
+      parentId: null,
+      order: menus.length + 1,
+      isActive: true,
+      isVisible: true,
+      description: `Menu automático para o formulário: ${firstForm.name}`
+    });
+    setDialogOpen(true);
+    setError('');
+  };
+
+  // Loading state
+  if (loading && menus.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh' }}>
+        <Header />
+        <Sidebar />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: '260px',
+            marginTop: '64px',
+          }}
+        >
+          <Box textAlign="center">
+            <Typography variant="h6" gutterBottom>
+              Carregando menus...
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <div>🔄 Aguarde...</div>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh' }}>
@@ -201,14 +325,25 @@ const MenuManager = () => {
               <Typography variant="body2" color="text.secondary">
                 Configure os menus do sistema e organize a navegação
               </Typography>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={() => handleOpenDialog()}
-                sx={{ borderRadius: 2 }}
-              >
-                Novo Menu
-              </Button>
+              <Box display="flex" gap={2}>
+                <Button
+                  variant="contained"
+                  startIcon={<Add />}
+                  onClick={() => handleOpenDialog()}
+                  sx={{ borderRadius: 2 }}
+                >
+                  Novo Menu
+                </Button>
+                {availableForms.length > 0 && (
+                  <Button
+                    variant="outlined"
+                    onClick={createQuickFormMenu}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    Menu Rápido p/ Formulário
+                  </Button>
+                )}
+              </Box>
             </Box>
           </Box>
 
@@ -294,21 +429,24 @@ const MenuManager = () => {
                                   </TableCell>
                                   <TableCell>
                                     <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {menu.urlOrPath || '-'}
+                                      {getMenuDescription(menu)}
                                     </Typography>
                                   </TableCell>
                                   <TableCell>
                                     {menu.rolesAllowed ? (
                                       <Box display="flex" flexWrap="wrap" gap={0.5}>
-                                        {menu.rolesAllowed.split(',').slice(0, 2).map(role => (
-                                          <Chip
-                                            key={role.trim()}
-                                            label={role.trim()}
-                                            size="small"
-                                            variant="outlined"
-                                            color="secondary"
-                                          />
-                                        ))}
+                                        {menu.rolesAllowed.split(',').slice(0, 2).map(roleValue => {
+                                          const role = availableRoles.find(r => r.value === roleValue.trim());
+                                          return (
+                                            <Chip
+                                              key={roleValue.trim()}
+                                              label={role?.label || roleValue.trim()}
+                                              size="small"
+                                              variant="outlined"
+                                              color={role?.color || 'default'}
+                                            />
+                                          );
+                                        })}
                                         {menu.rolesAllowed.split(',').length > 2 && (
                                           <Chip
                                             label={`+${menu.rolesAllowed.split(',').length - 2}`}
@@ -408,11 +546,28 @@ const MenuManager = () => {
                       value={formData.icon}
                       label="Ícone"
                       onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                      renderValue={(selected) => {
+                        const icon = availableIcons.find(i => i.value === selected);
+                        return (
+                          <Box display="flex" alignItems="center" gap={1}>
+                            {icon && <span style={{ fontSize: '20px' }}>{icon.icon}</span>}
+                            {icon?.label || 'Nenhum'}
+                          </Box>
+                        );
+                      }}
                     >
-                      <MenuItem value="">Nenhum</MenuItem>
+                      <MenuItem value="">
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <span style={{ fontSize: '20px' }}>❌</span>
+                          Nenhum
+                        </Box>
+                      </MenuItem>
                       {availableIcons.map(icon => (
-                        <MenuItem key={icon} value={icon}>
-                          {icon}
+                        <MenuItem key={icon.value} value={icon.value}>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <span style={{ fontSize: '20px' }}>{icon.icon}</span>
+                            {icon.label}
+                          </Box>
                         </MenuItem>
                       ))}
                     </Select>
@@ -420,38 +575,95 @@ const MenuManager = () => {
                 </Grid>
               </Grid>
               
-              <TextField
-                margin="dense"
-                label={
-                  formData.contentType === 'route' || formData.contentType === 'page' ? 'Caminho (ex: /dashboard)' :
-                  formData.contentType === 'external' || formData.contentType === 'link' ? 'URL Externa' :
-                  formData.contentType === 'form' ? 'ID/Path do Formulário' :
-                  'URL ou Caminho'
-                }
-                fullWidth
-                variant="outlined"
-                value={formData.urlOrPath}
-                onChange={(e) => setFormData({ ...formData, urlOrPath: e.target.value })}
-                sx={{ mb: 2 }}
-                placeholder={
-                  formData.contentType === 'route' ? '/dashboard' :
-                  formData.contentType === 'external' ? 'https://example.com' :
-                  formData.contentType === 'form' ? '1 ou /forms/contact' :
-                  ''
-                }
-              />
+              {/* Campo dinâmico baseado no tipo de conteúdo */}
+              {formData.contentType === 'form' ? (
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel>Selecionar Formulário</InputLabel>
+                  <Select
+                    value={formData.urlOrPath}
+                    label="Selecionar Formulário"
+                    onChange={(e) => setFormData({ ...formData, urlOrPath: e.target.value })}
+                    disabled={loadingForms}
+                  >
+                    <MenuItem value="">
+                      <em>Selecione um formulário</em>
+                    </MenuItem>
+                    {availableForms.map(form => (
+                      <MenuItem key={form.id} value={form.id.toString()}>
+                        {form.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {loadingForms && (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                      Carregando formulários...
+                    </Typography>
+                  )}
+                  <Typography variant="caption" color="primary" sx={{ mt: 0.5, display: 'block' }}>
+                    💡 Este menu abrirá diretamente o formulário selecionado
+                  </Typography>
+                </FormControl>
+              ) : (
+                <TextField
+                  margin="dense"
+                  label={
+                    formData.contentType === 'route' || formData.contentType === 'page' ? 'Caminho (ex: /dashboard)' :
+                    formData.contentType === 'external' || formData.contentType === 'link' ? 'URL Externa' :
+                    formData.contentType === 'iframe' ? 'URL do IFrame' :
+                    'URL ou Caminho'
+                  }
+                  fullWidth
+                  variant="outlined"
+                  value={formData.urlOrPath}
+                  onChange={(e) => setFormData({ ...formData, urlOrPath: e.target.value })}
+                  sx={{ mb: 2 }}
+                  placeholder={
+                    formData.contentType === 'route' ? '/dashboard' :
+                    formData.contentType === 'external' ? 'https://example.com' :
+                    formData.contentType === 'iframe' ? 'https://example.com/embed' :
+                    ''
+                  }
+                />
+              )}
               
-              <TextField
-                margin="dense"
-                label="Roles Permitidos (separados por vírgula)"
-                fullWidth
-                variant="outlined"
-                value={formData.rolesAllowed}
-                onChange={(e) => setFormData({ ...formData, rolesAllowed: e.target.value })}
-                sx={{ mb: 2 }}
-                placeholder="admin,manager,user ou all"
-                helperText="Use 'all' para permitir acesso a todos os usuários"
-              />
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Roles Permitidos</InputLabel>
+                <Select
+                  multiple
+                  value={formData.rolesAllowed ? formData.rolesAllowed.split(',').map(r => r.trim()) : []}
+                  label="Roles Permitidos"
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    rolesAllowed: Array.isArray(e.target.value) ? e.target.value.join(',') : e.target.value 
+                  })}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => {
+                        const role = availableRoles.find(r => r.value === value);
+                        return (
+                          <Chip
+                            key={value}
+                            label={role?.label || value}
+                            size="small"
+                            color={role?.color || 'default'}
+                          />
+                        );
+                      })}
+                    </Box>
+                  )}
+                >
+                  {availableRoles.map((role) => (
+                    <MenuItem key={role.value} value={role.value}>
+                      <Chip
+                        label={role.label}
+                        size="small"
+                        color={role.color}
+                        variant="outlined"
+                      />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               
               <TextField
                 margin="dense"
