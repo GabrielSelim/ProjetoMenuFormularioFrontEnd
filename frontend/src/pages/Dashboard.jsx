@@ -333,15 +333,7 @@ const Dashboard = () => {
                 </Stack>
               </Box>
 
-              <Box sx={{ ml: 'auto', display: { xs: 'none', md: 'block' } }}>
-                <Tooltip title="Notificações">
-                  <IconButton sx={{ color: 'white' }}>
-                    <Badge badgeContent={3} color="error">
-                      <Notifications />
-                    </Badge>
-                  </IconButton>
-                </Tooltip>
-              </Box>
+
             </Stack>
           </Paper>
 

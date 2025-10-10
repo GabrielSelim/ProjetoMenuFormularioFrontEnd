@@ -268,6 +268,16 @@ a:hover {
   border-radius: 8px;
 }
 
+/* Sobrescrever margin-left automática para telas de formulários */
+.form-page-main {
+  margin-left: 0 !important;
+}
+
+/* Classe específica para remover margin automática do MUI */
+.MuiBox-root.css-1hayn6e {
+  margin-left: 0 !important;
+}
+
 /* Print styles */
 @media print {
   .no-print {

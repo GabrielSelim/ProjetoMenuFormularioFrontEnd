@@ -19,6 +19,7 @@ import MenuManagerSimple from './pages/MenuManagerSimple';
 import TestPage from './pages/TestPage';
 import TestAPI from './pages/TestAPI';
 import FormBuilderPage from './pages/FormBuilderPage';
+import FormBuilderAdvanced from './pages/FormBuilderAdvanced';
 import FormList from './pages/FormList';
 import FormView from './pages/FormView';
 
@@ -214,6 +215,24 @@ function App() {
                   element={
                     <ProtectedRoute roles={['admin']}>
                       <FormBuilderPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/admin/forms/builder-advanced" 
+                  element={
+                    <ProtectedRoute roles={['admin']}>
+                      <FormBuilderAdvanced />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/admin/forms/builder-advanced/:id" 
+                  element={
+                    <ProtectedRoute roles={['admin']}>
+                      <FormBuilderAdvanced />
                     </ProtectedRoute>
                   } 
                 />

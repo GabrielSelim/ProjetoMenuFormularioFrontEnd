@@ -19,11 +19,24 @@ import {
   Chip,
   Alert
 } from '@mui/material';
+import FormEngineRenderer from './FormEngineRenderer';
 
 const FormRenderer = ({ schema, onSubmit, initialData = {}, readOnly = false }) => {
   const { control, handleSubmit, formState: { errors }, watch } = useForm({
     defaultValues: initialData
   });
+
+  // Tenta usar o FormEngineRenderer primeiro
+  const formEngineComponent = FormEngineRenderer({ 
+    formSchema: schema, 
+    onSubmit, 
+    title: schema?.title, 
+    description: schema?.description 
+  });
+  
+  if (formEngineComponent) {
+    return formEngineComponent;
+  }
 
   if (!schema || !schema.fields) {
     return (

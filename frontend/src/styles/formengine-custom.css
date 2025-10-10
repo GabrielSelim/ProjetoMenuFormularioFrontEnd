@@ -1,0 +1,217 @@
+/* Estilos personalizados para o FormEngine.io */
+
+/* Melhorar a aparência geral do construtor */
+.form-builder {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Personalizar a paleta lateral de componentes */
+.form-builder .rs-sidebar {
+  background-color: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+}
+
+/* Personalizar os componentes arrastáveis */
+.form-builder .draggable-component {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-builder .draggable-component:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+/* Personalizar a área de drop */
+.form-builder .drop-zone {
+  min-height: 400px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 16px;
+}
+
+.form-builder .drop-zone.drag-over {
+  border-color: #2196F3;
+  background-color: #e3f2fd;
+}
+
+/* Personalizar campos do formulário */
+.form-builder .rs-form-group {
+  margin-bottom: 20px;
+}
+
+.form-builder .rs-form-control-label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-builder .rs-input {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 12px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-builder .rs-input:focus {
+  border-color: #2196F3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  outline: none;
+}
+
+/* Personalizar botões */
+.form-builder .rs-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.form-builder .rs-btn-primary {
+  background-color: #2196F3;
+  border-color: #2196F3;
+}
+
+.form-builder .rs-btn-primary:hover {
+  background-color: #1976D2;
+  border-color: #1976D2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+/* Personalizar seletores */
+.form-builder .rs-picker-toggle {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 12px;
+}
+
+.form-builder .rs-picker-toggle:focus {
+  border-color: #2196F3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+/* Personalizar checkboxes e radios */
+.form-builder .rs-checkbox-checked .rs-checkbox-inner,
+.form-builder .rs-radio-checked .rs-radio-inner {
+  background-color: #2196F3;
+  border-color: #2196F3;
+}
+
+/* Personalizar o painel de propriedades */
+.form-builder .properties-panel {
+  background: white;
+  border-left: 1px solid #e9ecef;
+  padding: 20px;
+}
+
+.form-builder .properties-panel h3 {
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 8px;
+}
+
+/* Personalizar tooltips */
+.form-builder .rs-tooltip .rs-tooltip-inner {
+  background-color: #333;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+/* Personalizar a barra de ferramentas */
+.form-builder .toolbar {
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Personalizar mensagens de validação */
+.form-builder .rs-form-error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Personalizar o preview do formulário */
+.form-builder .form-preview {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .form-builder {
+    font-size: 14px;
+  }
+  
+  .form-builder .draggable-component {
+    margin: 4px;
+    padding: 8px;
+  }
+  
+  .form-builder .rs-input,
+  .form-builder .rs-picker-toggle {
+    padding: 10px;
+  }
+}
+
+/* Animações suaves */
+.form-builder * {
+  transition: all 0.2s ease;
+}
+
+/* Melhorar contraste para acessibilidade */
+.form-builder .rs-form-control-label {
+  color: #212529;
+}
+
+.form-builder .rs-help-block {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+/* Personalizar estado de loading */
+.form-builder .loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: #6c757d;
+}
+
+/* Personalizar estado vazio */
+.form-builder .empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.form-builder .empty-state h3 {
+  margin-bottom: 12px;
+  color: #495057;
+}
+
+.form-builder .empty-state p {
+  margin-bottom: 20px;
+  font-size: 14px;
+}

@@ -106,7 +106,6 @@ const FormView = () => {
           sx={{
             flexGrow: 1,
             p: 3,
-            marginLeft: '260px',
             marginTop: '64px',
             display: 'flex',
             justifyContent: 'center',
@@ -130,7 +129,6 @@ const FormView = () => {
           sx={{
             flexGrow: 1,
             p: 3,
-            marginLeft: '260px',
             marginTop: '64px',
           }}
         >
@@ -160,11 +158,12 @@ const FormView = () => {
       
       <Box
         component="main"
+        className="form-page-main"
         sx={{
           flexGrow: 1,
           p: 3,
-          marginLeft: '260px',
           marginTop: '64px',
+          marginLeft: '0 !important',
         }}
       >
         <Container maxWidth="md">

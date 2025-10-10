@@ -23,11 +23,20 @@
     "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
+    "@react-form-builder/components-rsuite": "^7.3.0",
+    "@react-form-builder/core": "^7.3.0",
+    "@react-form-builder/designer": "^7.3.0",
+    "@rsuite/icons": "^1.3.2",
     "@tanstack/react-query": "^5.90.2",
     "axios": "^1.12.2",
+    "mobx": "^6.15.0",
+    "mobx-react-lite": "^4.1.1",
     "react-hook-form": "^7.64.0",
     "react-icons": "^5.5.0",
+    "react-number-format": "^5.4.4",
     "react-router-dom": "^7.9.4",
+    "rsuite": "^5.83.3",
+    "rsuite-table": "^5.19.2",
     "yup": "^1.7.1"
   }
 }

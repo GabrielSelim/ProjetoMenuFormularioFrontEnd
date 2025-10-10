@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import TestComponents from '../components/TestComponents';
 
 const TestPage = () => {
   return (
@@ -10,6 +11,9 @@ const TestPage = () => {
       <Typography variant="body1" gutterBottom>
         Se você está vendo esta página, a rota está funcionando corretamente.
       </Typography>
+      
+      <TestComponents />
+      
       <Button variant="contained" onClick={() => window.history.back()}>
         Voltar
       </Button>

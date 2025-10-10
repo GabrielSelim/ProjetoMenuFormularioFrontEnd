@@ -227,8 +227,7 @@ const Sidebar = () => {
     { id: 'dashboard', name: 'Dashboard', urlOrPath: '/dashboard', contentType: 'route', icon: 'dashboard', order: 0 },
     { id: 'admin-section', name: 'ADMINISTRAÇÃO', contentType: 'section', order: 1 },
     { id: 'admin-menus', name: 'Gerenciar Menus', urlOrPath: '/admin/menus', contentType: 'route', icon: 'settings', order: 2 },
-    { id: 'form-builder', name: 'Construtor de Formulários', urlOrPath: '/admin/forms/builder', contentType: 'route', icon: 'build', order: 3 },
-    { id: 'form-list', name: 'Lista de Formulários', urlOrPath: '/forms', contentType: 'route', icon: 'description', order: 4 }
+    { id: 'form-list', name: 'Lista de Formulários', urlOrPath: '/forms', contentType: 'route', icon: 'description', order: 3 }
   ];
 
   return (

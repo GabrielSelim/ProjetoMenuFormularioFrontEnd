@@ -42,6 +42,29 @@ const FormList = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Função para contar campos (suporta FormEngine e formulários tradicionais)
+  const getFormFieldsCount = (form) => {
+    // FormEngine.io - contar children recursivamente
+    if (form.schema?.formEngineSchema?.form?.children) {
+      const countChildren = (children) => {
+        if (!Array.isArray(children)) return 0;
+        return children.reduce((count, child) => {
+          // Contar o próprio elemento se for um campo
+          let currentCount = (child.type && child.type !== 'Screen') ? 1 : 0;
+          // Contar filhos recursivamente
+          if (child.children) {
+            currentCount += countChildren(child.children);
+          }
+          return count + currentCount;
+        }, 0);
+      };
+      return countChildren(form.schema.formEngineSchema.form.children);
+    }
+    
+    // Formulários tradicionais
+    return form.schema?.fields?.length || 0;
+  };
+
   useEffect(() => {
     loadForms();
   }, []);
@@ -132,7 +155,8 @@ const FormList = () => {
   };
 
   const handleEdit = (formId) => {
-    navigate(`/admin/forms/builder/${formId}`);
+    console.log('🔧 Editando formulário ID:', formId);
+    navigate(`/admin/forms/builder-advanced/${formId}`);
   };
 
   const handleView = (formId) => {
@@ -156,11 +180,12 @@ const FormList = () => {
       
       <Box
         component="main"
+        className="form-page-main"
         sx={{
           flexGrow: 1,
           p: 3,
-          marginLeft: '260px',
           marginTop: '64px',
+          marginLeft: '0 !important',
         }}
       >
         <Container maxWidth="lg">
@@ -168,13 +193,15 @@ const FormList = () => {
             <Typography variant="h4" component="h1">
               Lista de Formulários
             </Typography>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => navigate('/admin/forms/builder')}
-            >
-              Criar Formulário
-            </Button>
+            <Box display="flex" gap={2}>
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => navigate('/admin/forms/builder-advanced')}
+              >
+                Construtor de Formulários
+              </Button>
+            </Box>
           </Box>
 
           {error && (
@@ -217,13 +244,15 @@ const FormList = () => {
                 }
               </Typography>
               {!searchTerm && (
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={() => navigate('/admin/forms/builder')}
-                >
-                  Criar Primeiro Formulário
-                </Button>
+                <Box display="flex" gap={2} justifyContent="center">
+                  <Button
+                    variant="contained"
+                    startIcon={<Add />}
+                    onClick={() => navigate('/admin/forms/builder-advanced')}
+                  >
+                    Construtor de Formulários
+                  </Button>
+                </Box>
               )}
             </Box>
           ) : (
@@ -232,16 +261,9 @@ const FormList = () => {
                 <Grid item xs={12} sm={6} md={4} key={form.id}>
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ flexGrow: 1 }}>
-                      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                        <Typography variant="h6" component="h2" gutterBottom>
-                          {form.name}
-                        </Typography>
-                        <Chip
-                          label={getStatusLabel(form.isActive)}
-                          color={getStatusColor(form.isActive)}
-                          size="small"
-                        />
-                      </Box>
+                      <Typography variant="h6" component="h2" gutterBottom>
+                        {form.name}
+                      </Typography>
                       
                       {form.description && (
                         <Typography
@@ -262,7 +284,7 @@ const FormList = () => {
                       
                       <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
                         <Chip
-                          label={`${form.schema?.fields?.length || 0} campos`}
+                          label={`${getFormFieldsCount(form)} campos`}
                           size="small"
                           variant="outlined"
                         />
@@ -348,7 +370,7 @@ const FormList = () => {
                 <Grid item xs={12} sm={4}>
                   <Box textAlign="center">
                     <Typography variant="h4" color="text.secondary">
-                      {forms.reduce((total, form) => total + (form.schema?.fields?.length || 0), 0)}
+                      {forms.reduce((total, form) => total + getFormFieldsCount(form), 0)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Total de Campos
