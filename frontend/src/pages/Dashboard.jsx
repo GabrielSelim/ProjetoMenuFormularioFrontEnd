@@ -171,7 +171,7 @@ const Dashboard = () => {
       description: 'Criar novos formulários personalizados',
       action: () => navigate('/admin/forms/builder'),
       icon: '🔧',
-      show: hasRole('admin'),
+      show: hasRole(['admin', 'manager']),
       color: 'success',
       gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
     },
@@ -180,7 +180,7 @@ const Dashboard = () => {
       description: 'Configurar navegação e menus do sistema',
       action: () => navigate('/admin/menus'),
       icon: '⚙️',
-      show: hasRole('admin'),
+      show: hasRole(['admin', 'manager']),
       color: 'warning',
       gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     },
@@ -189,7 +189,7 @@ const Dashboard = () => {
       description: 'Verificar conectividade e funcionalidades',
       action: () => navigate('/test-api'),
       icon: '🔍',
-      show: hasRole('admin'),
+      show: hasRole(['admin']),
       color: 'info',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     }

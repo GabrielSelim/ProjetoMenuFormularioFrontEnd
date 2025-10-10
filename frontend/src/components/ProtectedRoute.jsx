@@ -28,7 +28,7 @@ const ProtectedRoute = ({ children, roles = [] }) => {
 
   // Verifica se o usuário tem o role necessário
   if (roles.length > 0 && !hasRole(roles)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/access-denied" replace />;
   }
 
   return children;

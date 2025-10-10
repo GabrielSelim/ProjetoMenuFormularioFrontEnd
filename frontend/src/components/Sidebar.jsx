@@ -222,13 +222,23 @@ const Sidebar = () => {
 
   const organizedMenus = organizeMenus(menus);
 
-  // Menu padrão sempre visível
-  const defaultMenus = [
-    { id: 'dashboard', name: 'Dashboard', urlOrPath: '/dashboard', contentType: 'route', icon: 'dashboard', order: 0 },
-    { id: 'admin-section', name: 'ADMINISTRAÇÃO', contentType: 'section', order: 1 },
-    { id: 'admin-menus', name: 'Gerenciar Menus', urlOrPath: '/admin/menus', contentType: 'route', icon: 'settings', order: 2 },
-    { id: 'form-list', name: 'Lista de Formulários', urlOrPath: '/forms', contentType: 'route', icon: 'description', order: 3 }
-  ];
+  // Menu padrão - filtra baseado no role do usuário
+  const getDefaultMenus = () => {
+    const allMenus = [
+      { id: 'dashboard', name: 'Dashboard', urlOrPath: '/dashboard', contentType: 'route', icon: 'dashboard', order: 0 },
+      { id: 'admin-section', name: 'ADMINISTRAÇÃO', contentType: 'section', order: 1, requiresRole: ['admin', 'manager'] },
+      { id: 'admin-menus', name: 'Gerenciar Menus', urlOrPath: '/admin/menus', contentType: 'route', icon: 'settings', order: 2, requiresRole: ['admin', 'manager'] },
+      { id: 'form-list', name: 'Lista de Formulários', urlOrPath: '/forms', contentType: 'route', icon: 'description', order: 3, requiresRole: ['admin', 'manager'] }
+    ];
+
+    // Filtra menus baseado no role do usuário
+    return allMenus.filter(menu => {
+      if (!menu.requiresRole) return true; // Menu público
+      return hasRole(menu.requiresRole); // Verifica se o usuário tem o role necessário
+    });
+  };
+
+  const defaultMenus = getDefaultMenus();
 
   return (
     <Drawer

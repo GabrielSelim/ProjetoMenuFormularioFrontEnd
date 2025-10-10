@@ -22,6 +22,7 @@ import FormBuilderPage from './pages/FormBuilderPage';
 import FormBuilderAdvanced from './pages/FormBuilderAdvanced';
 import FormList from './pages/FormList';
 import FormView from './pages/FormView';
+import AccessDenied from './pages/AccessDenied';
 
 // Styles
 import './styles/global.css';
@@ -131,23 +132,7 @@ const theme = createTheme({
   },
 });
 
-// Página de não autorizado
-const UnauthorizedPage = () => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    minHeight: '100vh',
-    flexDirection: 'column',
-    gap: '16px'
-  }}>
-    <h1>Acesso Negado</h1>
-    <p>Você não tem permissão para acessar esta página.</p>
-    <button onClick={() => window.history.back()}>
-      Voltar
-    </button>
-  </div>
-);
+
 
 function App() {
   return (
@@ -161,8 +146,9 @@ function App() {
                 {/* Rota pública - Login */}
                 <Route path="/login" element={<Login />} />
                 
-                {/* Página de não autorizado */}
-                <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                {/* Página de acesso negado */}
+                <Route path="/access-denied" element={<AccessDenied />} />
+                <Route path="/unauthorized" element={<AccessDenied />} />
                 
                 {/* Rotas protegidas */}
                 <Route 
@@ -190,22 +176,21 @@ function App() {
                   element={<FormView />} 
                 />
                 
-                {/* Rotas de administração */}
+                {/* Rotas de administração - PROTEGIDAS para admin/manager */}
                 <Route 
                   path="/admin/menus" 
-                  element={<MenuManager />} 
+                  element={
+                    <ProtectedRoute roles={['admin', 'manager']}>
+                      <MenuManager />
+                    </ProtectedRoute>
+                  } 
                 />
                 
                 <Route 
                   path="/admin/menus-simple" 
-                  element={<MenuManagerSimple />} 
-                />
-                
-                <Route 
-                  path="/admin/menus-protected" 
                   element={
-                    <ProtectedRoute roles={['admin']}>
-                      <MenuManager />
+                    <ProtectedRoute roles={['admin', 'manager']}>
+                      <MenuManagerSimple />
                     </ProtectedRoute>
                   } 
                 />
@@ -213,7 +198,7 @@ function App() {
                 <Route 
                   path="/admin/forms/builder" 
                   element={
-                    <ProtectedRoute roles={['admin']}>
+                    <ProtectedRoute roles={['admin', 'manager']}>
                       <FormBuilderPage />
                     </ProtectedRoute>
                   } 
@@ -222,7 +207,7 @@ function App() {
                 <Route 
                   path="/admin/forms/builder-advanced" 
                   element={
-                    <ProtectedRoute roles={['admin']}>
+                    <ProtectedRoute roles={['admin', 'manager']}>
                       <FormBuilderAdvanced />
                     </ProtectedRoute>
                   } 
@@ -231,7 +216,7 @@ function App() {
                 <Route 
                   path="/admin/forms/builder-advanced/:id" 
                   element={
-                    <ProtectedRoute roles={['admin']}>
+                    <ProtectedRoute roles={['admin', 'manager']}>
                       <FormBuilderAdvanced />
                     </ProtectedRoute>
                   } 
@@ -240,7 +225,7 @@ function App() {
                 <Route 
                   path="/admin/forms/builder/:id" 
                   element={
-                    <ProtectedRoute roles={['admin']}>
+                    <ProtectedRoute roles={['admin', 'manager']}>
                       <FormBuilderPage />
                     </ProtectedRoute>
                   } 
@@ -249,17 +234,17 @@ function App() {
                 <Route 
                   path="/admin/forms" 
                   element={
-                    <ProtectedRoute roles={['admin']}>
+                    <ProtectedRoute roles={['admin', 'manager']}>
                       <FormList />
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Rotas de formulários */}
+                {/* Rotas de formulários - PROTEGIDAS para admin/manager */}
                 <Route 
                   path="/forms" 
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute roles={['admin', 'manager']}>
                       <FormList />
                     </ProtectedRoute>
                   } 
