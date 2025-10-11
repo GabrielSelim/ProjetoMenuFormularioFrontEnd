@@ -212,7 +212,7 @@ const FormBuilderAdvanced = () => {
           <Box display="flex" alignItems="center" gap={2}>
             <Button
               startIcon={<ArrowBack />}
-              onClick={() => navigate('/forms')}
+              onClick={() => navigate(-1)}
               variant="outlined"
               size="small"
             >

@@ -278,6 +278,17 @@ a:hover {
   margin-left: 0 !important;
 }
 
+/* Padronizar TODOS os containers para alinhamento idêntico */
+.MuiContainer-root,
+[class*="MuiContainer-root"] {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   /* Header mobile adjustments */

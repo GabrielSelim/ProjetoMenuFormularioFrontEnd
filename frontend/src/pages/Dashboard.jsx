@@ -168,7 +168,7 @@ const Dashboard = () => {
     {
       title: 'Construtor de Formulários',
       description: 'Criar novos formulários personalizados',
-      action: () => navigate('/admin/forms/builder'),
+      action: () => navigate('/admin/forms/builder-advanced'),
       icon: '🔧',
       show: hasRole(['admin', 'manager']),
       color: 'success',
@@ -182,15 +182,6 @@ const Dashboard = () => {
       show: hasRole(['admin', 'manager']),
       color: 'warning',
       gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-    },
-    {
-      title: 'Teste da API',
-      description: 'Verificar conectividade e funcionalidades',
-      action: () => navigate('/test-api'),
-      icon: '🔍',
-      show: hasRole(['admin']),
-      color: 'info',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     }
   ];
 
