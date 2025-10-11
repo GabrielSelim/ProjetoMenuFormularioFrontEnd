@@ -38,8 +38,7 @@ import {
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useMenu } from '../context/MenuContext';
 import { formService } from '../api/formService';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+import Layout from '../components/Layout';
 
 const MenuManager = () => {
   const { menus, loadAllMenus, createMenu, updateMenu, deleteMenu, reorderMenus, loading } = useMenu();
@@ -342,20 +341,8 @@ const MenuManager = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh' }}>
-      <Header />
-      <Sidebar />
-      
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          marginLeft: '260px',
-          marginTop: '64px',
-        }}
-      >
-        <Container maxWidth="xl">
+    <Layout>
+      <Container maxWidth="xl">
           <Box mb={3}>
             <Typography variant="h4" component="h1" gutterBottom>
               Gerenciamento de Menus - Sanz Tech
@@ -789,8 +776,7 @@ const MenuManager = () => {
             </DialogActions>
           </Dialog>
         </Container>
-      </Box>
-    </Box>
+    </Layout>
   );
 };
 

@@ -9,10 +9,10 @@ import {
   Avatar,
   Box
 } from '@mui/material';
-import { AccountCircle } from '@mui/icons-material';
+import { AccountCircle, Menu as MenuIcon } from '@mui/icons-material';
 import { AuthContext } from '../context/AuthContext';
 
-const Header = () => {
+const Header = ({ onMenuToggle, showMenuButton = false }) => {
   const { user, logout } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -37,6 +37,20 @@ const Header = () => {
       boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
     }}>
       <Toolbar>
+        {showMenuButton && (
+          <IconButton
+            color="inherit"
+            aria-label="abrir menu"
+            onClick={onMenuToggle}
+            edge="start"
+            sx={{ 
+              mr: 2,
+              display: { md: 'none' }
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
           Sistema de Formulários Sanz Tech
         </Typography>

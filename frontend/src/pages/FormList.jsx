@@ -28,8 +28,7 @@ import {
 } from '@mui/icons-material';
 import { formService } from '../api/formService';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+import Layout from '../components/Layout';
 import FormRenderer from '../components/FormRenderer';
 
 const FormList = () => {
@@ -166,21 +165,8 @@ const FormList = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh' }}>
-      <Header />
-      <Sidebar />
-      
-      <Box
-        component="main"
-        className="form-page-main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          marginTop: '64px',
-          marginLeft: '0 !important',
-        }}
-      >
-        <Container maxWidth="lg">
+    <Layout>
+      <Container maxWidth="lg">
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
             <Typography variant="h4" component="h1">
               Lista de Formulários
@@ -408,8 +394,7 @@ const FormList = () => {
             </DialogActions>
           </Dialog>
         </Container>
-      </Box>
-    </Box>
+    </Layout>
   );
 };
 

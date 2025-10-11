@@ -41,8 +41,7 @@ import { useAuth } from '../context/AuthContext';
 import { useMenu } from '../context/MenuContext';
 import { formService } from '../api/formService';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+import Layout from '../components/Layout';
 
 const Dashboard = () => {
   const { user, hasRole } = useAuth();
@@ -218,41 +217,24 @@ const Dashboard = () => {
 
   if (dashboardData.loading) {
     return (
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-        <Header />
-        <Sidebar />
+      <Layout>
         <Box
-          component="main"
           sx={{
-            flexGrow: 1,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginLeft: { xs: 0, sm: '260px' },
-            marginTop: '64px'
+            minHeight: 'calc(100vh - 200px)'
           }}
         >
           <CircularProgress size={48} />
         </Box>
-      </Box>
+      </Layout>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f8fafc' }}>
-      <Header />
-      <Sidebar />
-      
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: { xs: 2, md: 3 },
-          marginLeft: { xs: 0, sm: '260px' },
-          marginTop: '64px',
-          minHeight: 'calc(100vh - 64px)'
-        }}
-      >
+    <Layout>
+      <Box sx={{ bgcolor: '#f8fafc', minHeight: 'calc(100vh - 140px)', margin: -3, p: 3 }}>
         <Container maxWidth="xl">
           {/* Welcome Section */}
           <Paper 
@@ -566,7 +548,7 @@ const Dashboard = () => {
           </Paper>
         </Container>
       </Box>
-    </Box>
+    </Layout>
   );
 };
 

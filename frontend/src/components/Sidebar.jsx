@@ -75,7 +75,7 @@ const getMenuIcon = (iconName, type) => {
   return materialIcons[iconName?.toLowerCase()] || materialIcons[type?.toLowerCase()] || <InsertDriveFile />;
 };
 
-const Sidebar = () => {
+const Sidebar = ({ mobileOpen, onMobileClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { menus, loading, error } = useMenu();
@@ -118,6 +118,11 @@ const Sidebar = () => {
         if (menu.urlOrPath) {
           navigate(menu.urlOrPath);
         }
+    }
+    
+    // Fechar menu mobile após navegação
+    if (onMobileClose) {
+      onMobileClose();
     }
   };
 
@@ -237,21 +242,8 @@ const Sidebar = () => {
 
   const defaultMenus = getDefaultMenus();
 
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: 'background.paper',
-          borderRight: '1px solid',
-          borderColor: 'divider',
-        },
-      }}
-    >
+  const drawer = (
+    <>
       <Toolbar />
       <Box sx={{ overflow: 'auto', py: 1 }}>
         <List>
@@ -289,7 +281,49 @@ const Sidebar = () => {
           )}
         </List>
       </Box>
-    </Drawer>
+    </>
+  );
+
+  return (
+    <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+      {/* Mobile drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onMobileClose}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
+            width: drawerWidth,
+            backgroundColor: 'background.paper',
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
+      
+      {/* Desktop drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
+            width: drawerWidth,
+            backgroundColor: 'background.paper',
+            borderRight: '1px solid',
+            borderColor: 'divider',
+          },
+        }}
+        open
+      >
+        {drawer}
+      </Drawer>
+    </Box>
   );
 };
 

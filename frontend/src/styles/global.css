@@ -278,6 +278,97 @@ a:hover {
   margin-left: 0 !important;
 }
 
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  /* Header mobile adjustments */
+  .MuiAppBar-root .MuiToolbar-root {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  
+  /* Content padding adjustments */
+  .MuiBox-root main {
+    padding: 16px !important;
+  }
+  
+  /* Card adjustments */
+  .MuiCard-root {
+    margin-bottom: 16px;
+  }
+  
+  /* Typography mobile scaling */
+  .MuiTypography-h4 {
+    font-size: 1.75rem !important;
+  }
+  
+  .MuiTypography-h6 {
+    font-size: 1.1rem !important;
+  }
+  
+  /* Button mobile adjustments */
+  .MuiButton-root {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+  }
+  
+  /* Grid spacing adjustments */
+  .MuiGrid-container {
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Table responsiveness */
+  .MuiTableContainer-root {
+    overflow-x: auto;
+  }
+  
+  /* Drawer mobile overlay */
+  .MuiDrawer-root .MuiDrawer-paperAnchorLeft {
+    width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small devices */
+  .MuiContainer-root {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
+  .MuiTypography-h4 {
+    font-size: 1.5rem !important;
+  }
+  
+  .MuiButton-root {
+    min-width: auto;
+    padding: 6px 12px;
+  }
+  
+  /* Stack buttons vertically on very small screens */
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .form-actions .MuiButton-root {
+    width: 100%;
+  }
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+  .MuiButton-root {
+    min-height: 44px; /* Better touch targets */
+  }
+  
+  .MuiListItemButton-root {
+    min-height: 48px;
+  }
+  
+  .MuiIconButton-root {
+    padding: 12px;
+  }
+}
+
 /* Print styles */
 @media print {
   .no-print {
