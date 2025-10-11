@@ -97,8 +97,6 @@ const Sidebar = () => {
 
   const handleNavigation = (menu) => {
     const menuType = menu.contentType?.toLowerCase();
-    console.log('🔗 Navegando via menu:', menu.name, 'Tipo:', menuType, 'URL/Path:', menu.urlOrPath);
-    
     switch (menuType) {
       case 'route':
       case 'page':
@@ -107,7 +105,6 @@ const Sidebar = () => {
       case 'form':
       case 'formulario':
         // Para menus do tipo formulário, navega diretamente para /forms/{formId}
-        console.log('📝 Abrindo formulário via menu, ID:', menu.urlOrPath);
         navigate(`/forms/${menu.urlOrPath}`);
         break;
       case 'iframe':

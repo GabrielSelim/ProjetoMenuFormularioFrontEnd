@@ -35,14 +35,11 @@ const FormBuilderMinimal = ({ onFormChange }) => {
 
   // Função getForm assíncrona - deve retornar STRING JSON
   const getFormFn = useCallback(async (name) => {
-    console.log('getFormFn called with:', name);
-    console.log('returning JSON string of formData');
     return JSON.stringify(formData);
   }, [formData]);
 
   // Handler para mudanças no formulário
   const handleFormChange = useCallback((newFormData) => {
-    console.log('Form changed:', newFormData);
     if (newFormData) {
       setFormData(newFormData);
       if (onFormChange) {

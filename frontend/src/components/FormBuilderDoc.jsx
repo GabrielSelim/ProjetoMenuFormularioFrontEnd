@@ -167,7 +167,6 @@ export const FormBuilderDoc = () => {
   const setRef = useCallback((viewer) => {
     if (viewer) {
       ref.current = viewer;
-      console.log(ref.current);
     }
   }, []);
 
@@ -186,14 +185,11 @@ export const FormBuilderDoc = () => {
       formStorage={formStorage}
       localize={localizeFn}
       onFormDataChange={({ data, errors }) => {
-        console.log('onFormDataChange', { data, errors });
       }}
       viewerRef={setRef}
       validators={customValidators}
       actions={{
-        logEventArgs: e => console.log(e),
         assertArgs: ActionDefinition.functionalAction((e, args) => {
-          console.log(e, args);
         }, {
           p1: 'string',
           p2: 'boolean',

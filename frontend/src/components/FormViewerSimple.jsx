@@ -28,7 +28,6 @@ const FormViewerSimple = ({ form, formName = 'Preview' }) => {
   const setRef = useCallback((viewer) => {
     if (viewer) {
       ref.current = viewer;
-      console.log('FormViewer ref set:', ref.current);
     }
   }, []);
 
@@ -39,16 +38,9 @@ const FormViewerSimple = ({ form, formName = 'Preview' }) => {
   }, []);
 
   const handleFormDataChange = useCallback(({ data, errors }) => {
-    console.log('Form data changed in viewer:', { data, errors });
   }, []);
 
   const getFormFn = useCallback(async (name) => {
-    console.log('=== VIEWER getFormFn DEBUG ===');
-    console.log('name:', name);
-    console.log('formName:', formName);
-    console.log('form received:', form);
-    console.log('form type:', typeof form);
-    console.log('=============================');
     
     if (name === formName && form) {
       // O FormViewer também precisa de uma string JSON completa
@@ -69,7 +61,6 @@ const FormViewerSimple = ({ form, formName = 'Preview' }) => {
       };
       
       const jsonString = JSON.stringify(fullForm);
-      console.log('Returning JSON string for viewer (first 200 chars):', jsonString.substring(0, 200));
       return jsonString;
     }
     throw new Error(`Form '${name}' not found.`);
@@ -91,7 +82,6 @@ const FormViewerSimple = ({ form, formName = 'Preview' }) => {
         viewerRef={setRef}
         validators={customValidators}
         actions={{
-          logEventArgs: e => console.log('Form action:', e)
         }}
       />
     </div>

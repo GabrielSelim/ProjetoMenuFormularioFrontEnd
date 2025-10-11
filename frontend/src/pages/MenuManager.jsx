@@ -64,10 +64,8 @@ const MenuManager = () => {
   useEffect(() => {
     const initializeData = async () => {
       try {
-        console.log('🚀 Inicializando MenuManager...');
         await loadAllMenus();
         await loadAvailableForms();
-        console.log('✅ MenuManager inicializado com sucesso');
       } catch (err) {
         console.error('❌ Erro ao inicializar MenuManager:', err);
         setError('Erro ao carregar dados iniciais');
@@ -267,7 +265,6 @@ const MenuManager = () => {
       // Recarrega os menus para garantir sincronização
       await loadAllMenus();
       
-      console.log('✅ Menus reordenados e recarregados com sucesso');
     } catch (err) {
       console.error('❌ Erro ao reordenar menus:', err);
       setError(err.message || 'Erro ao reordenar menus');

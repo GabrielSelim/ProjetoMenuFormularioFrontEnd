@@ -25,10 +25,7 @@ const FormView = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  console.log('🎯 FormView iniciou - ID do formulário:', id);
-
   useEffect(() => {
-    console.log('🔄 useEffect disparado, carregando formulário...');
     loadForm();
   }, [id]);
 
@@ -37,9 +34,7 @@ const FormView = () => {
       setLoading(true);
       setError('');
       
-      console.log('Carregando formulário com ID:', id);
       const formData = await formService.getFormById(id);
-      console.log('Dados do formulário recebidos:', formData);
       
       if (!formData) {
         setError('Formulário não encontrado');
@@ -51,9 +46,7 @@ const FormView = () => {
       if (formData.schemaJson && typeof formData.schemaJson === 'string') {
         try {
           parsedForm.schema = JSON.parse(formData.schemaJson);
-          console.log('Schema parseado:', parsedForm.schema);
         } catch (parseError) {
-          console.error('Erro ao parsear schema JSON:', parseError);
           setError('Schema do formulário está em formato inválido');
           return;
         }
@@ -198,11 +191,7 @@ const FormView = () => {
           {/* Formulário */}
           {form && form.schema ? (
             <Box sx={{ position: 'relative' }}>
-              {(() => {
-                console.log('✅ Renderizando FormRenderer com schema:', form.schema);
-                console.log('📝 Campos disponíveis:', form.schema?.fields);
-                return null;
-              })()}
+
               
               {submitting && (
                 <Box
@@ -237,12 +226,7 @@ const FormView = () => {
             </Box>
           ) : (
             <Box>
-              {(() => {
-                console.log('❌ Schema não encontrado ou inválido!');
-                console.log('🔍 Dados do form:', form);
-                console.log('🔍 Schema disponível:', form?.schema);
-                return null;
-              })()}
+
               
               <Alert severity="warning">
                 Schema do formulário não encontrado ou inválido.

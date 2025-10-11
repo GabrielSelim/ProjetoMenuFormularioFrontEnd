@@ -2,10 +2,8 @@ import React from 'react';
 import { rSuiteComponents } from '@react-form-builder/components-rsuite';
 
 // Log para descobrir os componentes disponíveis
-console.log('=== Componentes RSuite Disponíveis ===');
 const componentsMetadata = rSuiteComponents.map(definer => {
   const component = definer.build();
-  console.log(`Tipo: ${component.model.type}`);
   return component.model.type;
 });
 

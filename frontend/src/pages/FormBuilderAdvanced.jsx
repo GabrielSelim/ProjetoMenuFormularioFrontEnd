@@ -58,9 +58,7 @@ const FormBuilderAdvanced = () => {
       setLoading(true);
       setError('');
       
-      console.log('Carregando formulário para edição:', formId);
       const formToEdit = await formService.getFormById(formId);
-      console.log('Formulário carregado:', formToEdit);
       
       if (!formToEdit) {
         setError('Formulário não encontrado');
@@ -68,26 +66,20 @@ const FormBuilderAdvanced = () => {
       }
       
       // Debug: verificar estrutura do formulário carregado
-      console.log('=== DEBUGGING FORM LOAD ===');
-      console.log('formToEdit completo:', formToEdit);
-      console.log('formToEdit.schema:', formToEdit.schema);
       
       let parsedSchema = null;
       if (typeof formToEdit.schemaJson === 'string') {
         try {
           parsedSchema = JSON.parse(formToEdit.schemaJson);
-          console.log('Schema parseado de string:', parsedSchema);
         } catch (e) {
           console.error('Erro ao parsear schemaJson:', e);
         }
       } else if (typeof formToEdit.schemaJson === 'object') {
         parsedSchema = formToEdit.schemaJson;
-        console.log('Schema já é objeto:', parsedSchema);
       }
 
       // Usar o schema parseado ou o schema já existente
       const schema = parsedSchema || formToEdit.schema;
-      console.log('Schema final usado:', schema);
 
       // Carregar dados básicos do formulário
       const newFormData = {
@@ -98,26 +90,20 @@ const FormBuilderAdvanced = () => {
         version: formToEdit.version || '1.0'
       };
       
-      console.log('Setando formData para:', newFormData);
       setFormData(newFormData);
       
       // Extrair o form do FormEngine se disponível
       let extractedForm = null;
       
       if (schema?.formEngineSchema?.form) {
-        console.log('Form do FormEngine encontrado:', schema.formEngineSchema.form);
         extractedForm = schema.formEngineSchema.form;
       } else if (schema?.formEngineSchema && typeof schema.formEngineSchema === 'object') {
         // Talvez o formEngineSchema seja o próprio form
-        console.log('Tentando usar formEngineSchema como form:', schema.formEngineSchema);
         extractedForm = schema.formEngineSchema;
       } else {
-        console.log('Nenhum form do FormEngine encontrado');
-        console.log('Estrutura do formEngineSchema:', schema?.formEngineSchema);
       }
       
       if (extractedForm) {
-        console.log('Setando form extraído:', extractedForm);
         setForm(extractedForm);
       }
       
@@ -131,7 +117,6 @@ const FormBuilderAdvanced = () => {
 
   // Função para salvar o formulário
   const handleSaveForm = async () => {
-    console.log('handleSaveForm called');
 
     if (!formData.name || !formData.title) {
       setError('Nome e título são obrigatórios');
@@ -140,7 +125,6 @@ const FormBuilderAdvanced = () => {
 
     // Pegar o formulário atual do FormBuilder
     const currentForm = formBuilderRef.current?.getCurrentForm();
-    console.log('Current form from builder:', currentForm);
 
     if (!currentForm || !currentForm.children || currentForm.children.length === 0) {
       setError('Adicione pelo menos um campo ao formulário');
@@ -158,9 +142,6 @@ const FormBuilderAdvanced = () => {
         fields: []
       };
       
-      console.log('=== SAVING FORM ===');
-      console.log('currentForm sendo salvo:', currentForm);
-      console.log('schemaData completo:', schemaData);
       
       const formPayload = {
         name: formData.name,
@@ -190,11 +171,6 @@ const FormBuilderAdvanced = () => {
   // Função para preview
   const handlePreview = () => {
     const currentForm = formBuilderRef.current?.getCurrentForm();
-    console.log('=== PREVIEW DEBUG ===');
-    console.log('currentForm:', currentForm);
-    console.log('currentForm type:', typeof currentForm);
-    console.log('currentForm.children:', currentForm?.children);
-    console.log('===================');
     
     if (!currentForm || !currentForm.children || currentForm.children.length === 0) {
       setError('Adicione campos ao formulário para visualizar');

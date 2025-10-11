@@ -30,8 +30,6 @@ const emptyForm = {
 };
 
 async function getFormFn(name) {
-  console.log('getFormFn called with:', name);
-  console.log('returning JSON string of form');
   return JSON.stringify(emptyForm);
 }
 
@@ -41,7 +39,6 @@ const FormBuilderTest = React.forwardRef((props, ref) => {
   const setBuilderRef = useCallback((builder) => {
     if (builder) {
       builderRef.current = builder;
-      console.log('Builder ref set:', builderRef.current);
     }
   }, []);
 
@@ -50,15 +47,12 @@ const FormBuilderTest = React.forwardRef((props, ref) => {
     getCurrentForm: () => {
       if (builderRef.current) {
         try {
-          console.log('=== getCurrentForm DEBUG ===');
           
           // Primeiro, tentar acessar formAsString
           let formData = builderRef.current.formAsString;
-          console.log('formAsString type:', typeof formData);
           
           // Se formAsString retornar um objeto, tratar como tal
           if (typeof formData === 'object' && formData !== null) {
-            console.log('formAsString returned object, using directly');
             // Se já é um objeto com a estrutura correta
             if (formData.form) {
               return formData.form;
@@ -72,14 +66,11 @@ const FormBuilderTest = React.forwardRef((props, ref) => {
           
           // Se for string, fazer parse
           if (typeof formData === 'string') {
-            console.log('formAsString returned string, parsing...');
             const parsed = JSON.parse(formData);
             return parsed.form || parsed;
           }
           
           // Fallback: tentar outras propriedades do builder
-          console.log('Trying alternative methods...');
-          console.log('Available properties:', Object.keys(builderRef.current));
           
           return null;
         } catch (e) {

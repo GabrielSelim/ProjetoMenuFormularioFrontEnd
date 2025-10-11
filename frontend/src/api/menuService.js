@@ -4,10 +4,8 @@ export const menuService = {
   // Busca todos os menus
   getMenus: async () => {
     try {
-      console.log('🔍 Buscando todos os menus...');
       const response = await api.get('/Menus');
       const menus = Array.isArray(response.data) ? response.data : [];
-      console.log('✅ Menus encontrados:', menus.length);
       return menus;
     } catch (error) {
       console.error('❌ Erro ao buscar menus:', error);
@@ -19,7 +17,6 @@ export const menuService = {
   // Busca menus filtrados por role do usuário (filtrado no frontend)
   getMenusByRole: async (role) => {
     try {
-      console.log('🔍 Buscando menus para role:', role);
       const response = await api.get('/Menus');
       const allMenus = Array.isArray(response.data) ? response.data : [];
       
@@ -30,7 +27,6 @@ export const menuService = {
         return allowedRoles.includes(role.toLowerCase()) || allowedRoles.includes('all');
       });
       
-      console.log('✅ Menus filtrados:', filteredMenus.length);
       return filteredMenus;
     } catch (error) {
       console.error('❌ Erro ao buscar menus por role:', error);
@@ -72,7 +68,6 @@ export const menuService = {
   // Reordena os menus (atualiza a ordem de cada menu individualmente)
   reorderMenus: async (reorderedMenus) => {
     try {
-      console.log('🔄 Reordenando menus:', reorderedMenus.map(m => ({ id: m.id, name: m.name, newOrder: reorderedMenus.indexOf(m) + 1 })));
       
       const updatePromises = reorderedMenus.map((menu, index) => {
         // Envia apenas os campos necessários para a API
@@ -86,12 +81,10 @@ export const menuService = {
           parentId: menu.parentId
         };
         
-        console.log(`📝 Atualizando menu ${menu.id} com ordem ${index + 1}`);
         return api.put(`/Menus/${menu.id}`, updateData);
       });
       
       await Promise.all(updatePromises);
-      console.log('✅ Reordenação concluída com sucesso');
       return { success: true };
     } catch (error) {
       console.error('❌ Erro ao reordenar menus:', error);

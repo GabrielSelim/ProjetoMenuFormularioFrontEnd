@@ -40,7 +40,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
   // Função para obter o form com a estrutura completa necessária
   const getFormFn = useCallback(async (name) => {
     try {
-      console.log('FormEngineRenderer getFormFn called with:', name);
       const formEngineData = formSchema.formEngineSchema;
       
       let formData;
@@ -67,7 +66,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
         "defaultLanguage": formData.defaultLanguage || "pt-BR"
       };
       
-      console.log('FormEngineRenderer returning JSON string');
       return JSON.stringify(fullForm);
     } catch (error) {
       console.error('Erro ao processar schema do FormEngine:', error);
@@ -118,7 +116,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
             formName="rendered-form"
             initialData={{}}
             onFormDataChange={({ data, errors }) => {
-              console.log('Form data changed:', { data, errors });
             }}
           />
         </Box>

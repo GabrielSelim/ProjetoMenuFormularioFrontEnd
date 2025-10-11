@@ -47,12 +47,10 @@ const FormBuilderSimple = ({ onFormChange }) => {
 
   // A função getForm deve ser assíncrona conforme a documentação
   const getFormFn = useCallback(async (name) => {
-    console.log('getFormFn called with name:', name, 'returning:', currentForm);
     return currentForm;
   }, [currentForm]);
 
   const handleFormChange = useCallback((newForm) => {
-    console.log('Form structure changed:', newForm);
     if (newForm) {
       setCurrentForm(newForm);
       if (onFormChange) {
@@ -76,7 +74,6 @@ const FormBuilderSimple = ({ onFormChange }) => {
         initialData={{}}
         onFormChange={handleFormChange}
         onFormDataChange={({ data, errors }) => {
-          console.log('onFormDataChange', { data, errors });
         }}
       />
     </div>

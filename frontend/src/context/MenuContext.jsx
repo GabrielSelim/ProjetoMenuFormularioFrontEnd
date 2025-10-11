@@ -29,12 +29,10 @@ export const MenuProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      console.log('🔄 Carregando menus para role:', user.role);
       const menusData = await menuService.getMenusByRole(user.role);
       
       if (Array.isArray(menusData)) {
         setMenus(menusData);
-        console.log('✅ Menus carregados por role:', menusData.length);
       } else {
         setMenus([]);
         console.warn('⚠️ Dados de menus por role inválidos:', menusData);
@@ -57,12 +55,10 @@ export const MenuProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      console.log('🔄 Carregando todos os menus...');
       const menusData = await menuService.getMenus();
       
       if (Array.isArray(menusData)) {
         setMenus(menusData);
-        console.log('✅ Menus carregados:', menusData.length);
       } else {
         setMenus([]);
         console.warn('⚠️ Dados de menus inválidos:', menusData);
@@ -116,7 +112,6 @@ export const MenuProvider = ({ children }) => {
   // Reordena os menus
   const reorderMenus = async (reorderedMenus) => {
     try {
-      console.log('🔄 Iniciando reordenação de menus...');
       
       // Atualiza otimisticamente a UI primeiro
       setMenus(reorderedMenus);
@@ -124,7 +119,6 @@ export const MenuProvider = ({ children }) => {
       // Envia para o servidor
       await menuService.reorderMenus(reorderedMenus);
       
-      console.log('✅ Reordenação concluída no servidor');
     } catch (err) {
       console.error('❌ Erro na reordenação:', err);
       throw err;
