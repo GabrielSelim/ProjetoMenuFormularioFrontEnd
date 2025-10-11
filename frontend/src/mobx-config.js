@@ -6,5 +6,5 @@ configure({
   computedRequiresReaction: false,
   reactionRequiresObservable: false,
   observableRequiresReaction: false,
-  disableErrorBoundaries: true
+  disableErrorBoundaries: false // Remover warning de debug
 });

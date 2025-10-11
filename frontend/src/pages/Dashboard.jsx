@@ -225,13 +225,18 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <Box sx={{ bgcolor: '#f8fafc', minHeight: 'calc(100vh - 140px)', margin: -3, p: 3 }}>
-        <Container maxWidth="xl">
+      <Box sx={{ 
+        bgcolor: '#f8fafc', 
+        minHeight: 'calc(100vh - 140px)', 
+        margin: { xs: -2, md: -3 }, 
+        p: { xs: 2, md: 3 } 
+      }}>
+        <Container maxWidth="xl" sx={{ px: { xs: 1, md: 3 } }}>
           {/* Welcome Section */}
           <Paper 
             elevation={0} 
             sx={{ 
-              p: { xs: 3, md: 4 }, 
+              p: { xs: 2, md: 4 }, 
               mb: 4, 
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: 'white',
@@ -241,20 +246,12 @@ const Dashboard = () => {
             }}
           >
             {/* Background decoration */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: -50,
-                right: -50,
-                width: 200,
-                height: 200,
-                borderRadius: '50%',
-                background: 'rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)'
-              }}
-            />
-            
-            <Stack direction={{ xs: 'column', md: 'row' }} alignItems="center" spacing={3}>
+            <Stack 
+              direction={{ xs: 'column', md: 'row' }} 
+              alignItems="center" 
+              spacing={{ xs: 2, md: 3 }}
+              sx={{ position: 'relative', zIndex: 1 }}
+            >
               <Badge
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -266,41 +263,56 @@ const Dashboard = () => {
               >
                 <Avatar 
                   sx={{ 
-                    width: { xs: 60, md: 80 }, 
-                    height: { xs: 60, md: 80 }, 
+                    width: { xs: 50, md: 70 }, 
+                    height: { xs: 50, md: 70 }, 
                     bgcolor: 'rgba(255,255,255,0.2)',
-                    backdropFilter: 'blur(10px)',
-                    fontSize: { xs: 24, md: 32 }
+                    fontSize: { xs: 20, md: 28 },
+                    flexShrink: 0
                   }}
                 >
                   {user?.name ? user.name.charAt(0).toUpperCase() : <People />}
                 </Avatar>
               </Badge>
               
-              <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-                <Typography variant={{ xs: 'h4', md: 'h3' }} gutterBottom sx={{ fontWeight: 300 }}>
+              <Box sx={{ textAlign: { xs: 'center', md: 'left' }, flex: 1 }}>
+                <Typography 
+                  variant="h4" 
+                  gutterBottom 
+                  sx={{ 
+                    fontWeight: 300,
+                    fontSize: { xs: '1.5rem', md: '2.2rem' },
+                    lineHeight: { xs: 1.2, md: 1.3 }
+                  }}
+                >
                   {getGreeting()}, {user?.name || user?.email?.split('@')[0]}!
                 </Typography>
                 <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 300, mb: 2 }}>
                   Bem-vindo ao Sistema de Formulários Sanz Tech
                 </Typography>
-                <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', md: 'flex-start' }}>
+                <Stack 
+                  direction={{ xs: 'column', sm: 'row' }} 
+                  spacing={1} 
+                  justifyContent={{ xs: 'center', md: 'flex-start' }}
+                  sx={{ mt: 1 }}
+                >
                   <Chip 
                     icon={<Stars />}
                     label={user?.role === 'admin' ? 'Administrador' : 'Usuário'}
+                    size="small"
                     sx={{ 
                       bgcolor: 'rgba(255,255,255,0.2)',
                       color: 'white',
-                      backdropFilter: 'blur(10px)'
+                      '& .MuiChip-icon': { fontSize: '16px' }
                     }}
                   />
                   <Chip 
                     icon={<AccessTime />}
                     label={new Date().toLocaleDateString('pt-BR')}
+                    size="small"
                     sx={{ 
                       bgcolor: 'rgba(255,255,255,0.1)',
                       color: 'white',
-                      backdropFilter: 'blur(10px)'
+                      '& .MuiChip-icon': { fontSize: '16px' }
                     }}
                   />
                 </Stack>
@@ -313,7 +325,7 @@ const Dashboard = () => {
           {/* Stats Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {stats.map((stat, index) => (
-              <Grid item xs={12} sm={6} lg={3} key={index}>
+              <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
                 <Card 
                   onClick={stat.onClick}
                   sx={{ 
@@ -382,7 +394,7 @@ const Dashboard = () => {
 
           <Grid container spacing={4}>
             {/* Quick Actions */}
-            <Grid item xs={12} lg={8}>
+            <Grid size={{ xs: 12, lg: 8 }}>
               <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
                   <Typography variant="h5" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -395,7 +407,7 @@ const Dashboard = () => {
                   {quickActions
                     .filter(action => action.show)
                     .map((action, index) => (
-                      <Grid item xs={12} sm={6} key={index}>
+                      <Grid key={index} size={{ xs: 12, sm: 6 }}>
                         <Card 
                           onClick={action.action}
                           sx={{ 
@@ -443,7 +455,7 @@ const Dashboard = () => {
             </Grid>
 
             {/* Recent Activity */}
-            <Grid item xs={12} lg={4}>
+            <Grid size={{ xs: 12, lg: 4 }}>
               <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                   🕒 Atividade Recente
@@ -492,7 +504,7 @@ const Dashboard = () => {
               📊 Status do Sistema
             </Typography>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="success.main" sx={{ fontWeight: 'bold' }}>
                     99.9%
@@ -508,7 +520,7 @@ const Dashboard = () => {
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="primary.main" sx={{ fontWeight: 'bold' }}>
                     <Speed /> Fast
@@ -524,7 +536,7 @@ const Dashboard = () => {
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="info.main" sx={{ fontWeight: 'bold' }}>
                     v2.1.0

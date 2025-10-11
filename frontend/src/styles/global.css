@@ -294,12 +294,27 @@ a:hover {
   /* Header mobile adjustments */
   .MuiAppBar-root .MuiToolbar-root {
     padding-left: 8px;
-    padding-right: 8px;
+    padding-right: 0px;
+    justify-content: space-between;
+  }
+  
+  /* Avatar and menu adjustments */
+  .MuiAppBar-root .MuiBox-root {
+    margin-right: 16px !important;
   }
   
   /* Content padding adjustments */
   .MuiBox-root main {
     padding: 16px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Dashboard mobile centering */
+  main > div {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100% !important;
   }
   
   /* Card adjustments */
