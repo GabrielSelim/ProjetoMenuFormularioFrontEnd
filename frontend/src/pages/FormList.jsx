@@ -236,7 +236,7 @@ const FormList = () => {
           ) : (
             <Grid container spacing={3}>
               {filteredForms.map((form) => (
-                <Grid item xs={12} sm={6} md={4} key={form.id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={form.id}>
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ flexGrow: 1 }}>
                       <Typography variant="h6" component="h2" gutterBottom>
@@ -325,7 +325,7 @@ const FormList = () => {
                 Estatísticas
               </Typography>
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                   <Box textAlign="center">
                     <Typography variant="h4" color="primary">
                       {forms.length}
@@ -335,7 +335,7 @@ const FormList = () => {
                     </Typography>
                   </Box>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                   <Box textAlign="center">
                     <Typography variant="h4" color="success.main">
                       {forms.filter(f => f.isActive).length}
@@ -345,7 +345,7 @@ const FormList = () => {
                     </Typography>
                   </Box>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                   <Box textAlign="center">
                     <Typography variant="h4" color="text.secondary">
                       {forms.reduce((total, form) => total + getFormFieldsCount(form), 0)}

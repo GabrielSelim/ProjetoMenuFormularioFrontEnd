@@ -8,8 +8,32 @@ import {
   CardActions,
   Button,
   Container,
-  Avatar,
-  Chip,
+    // Adiciona algumas atividades do sistema para preencher a lista
+    if (activities.length < 3) {
+      activities.push({
+        id: 'system-1',
+        type: 'system',
+        title: 'Sistema inicializado',
+        time: new Date(now.getTime() - (4 * 60 * 60 * 1000)),
+        icon: '🚀',
+        color: 'info'
+      });
+    }
+
+    if (activities.length < 4) {
+      activities.push({
+        id: 'system-2',
+        type: 'system',
+        title: 'Backup automático realizado',
+        time: new Date(now.getTime() - (8 * 60 * 60 * 1000)),
+        icon: '💾',
+        color: 'success'
+      });
+    }
+
+    return activities
+      .sort((a, b) => new Date(b.time) - new Date(a.time))
+      .slice(0, 5);,
   Paper,
   Stack,
   LinearProgress,
@@ -45,7 +69,7 @@ import Layout from '../components/Layout';
 
 const Dashboard = () => {
   const { user, hasRole } = useAuth();
-  const { menus } = useMenu();
+  const { menus, loadAllMenus } = useMenu();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState({
     totalForms: 0,
@@ -56,24 +80,70 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    console.log('🔄 Dashboard: Atualizando dados devido a mudança nos menus:', menus.length);
     loadDashboardData();
   }, [menus]);
 
+  // Carregamento inicial do dashboard
+  useEffect(() => {
+    console.log('🚀 Dashboard: Componente montado, carregando dados iniciais');
+    loadDashboardData();
+  }, []);
+
+  // Recarregar dados quando voltar para o dashboard e polling
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log('🔄 Dashboard: Recarregando por foco na janela');
+      loadDashboardData();
+    };
+    
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('🔄 Dashboard: Recarregando por mudança de visibilidade');
+        loadDashboardData();
+      }
+    };
+    
+    // Polling a cada 10 segundos para capturar mudanças mais rapidamente
+    const interval = setInterval(() => {
+      if (!document.hidden) {
+        console.log('🔄 Dashboard: Recarregando por polling automático');
+        loadDashboardData();
+      }
+    }, 10000);
+    
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   const loadDashboardData = async () => {
     try {
+      console.log('📊 Dashboard: Carregando dados...');
+      console.log('📋 Menus disponíveis:', menus.length, menus.map(m => m.name));
+      
       let forms = [];
       try {
         forms = await formService.getForms();
+        console.log('📝 Formulários carregados:', forms.length);
       } catch (err) {
         console.warn('Não foi possível carregar formulários:', err);
       }
+
+      const newActivity = generateRecentActivity(forms, menus);
+      console.log('🕐 Atividade recente gerada:', newActivity.length, 'itens');
 
       setDashboardData({
         totalForms: forms.length,
         activeForms: forms.filter(f => f.isActive !== false).length,
         totalMenus: menus.length,
         formMenus: menus.filter(m => m.contentType === 'form').length,
-        recentActivity: generateRecentActivity(forms, menus),
+        recentActivity: newActivity,
         loading: false
       });
     } catch (err) {
@@ -86,69 +156,50 @@ const Dashboard = () => {
     const activities = [];
     const now = new Date();
     
-    // Adiciona atividades dos formulários (somente formulários, pois menus não têm timestamps)
+    // Adiciona atividades dos formulários (mais recentes primeiro)
     forms
       .sort((a, b) => {
-        // Usa o timestamp mais recente (updatedAt ou createdAt)
-        const timeA = new Date(Math.max(
-          new Date(a.updatedAt || a.createdAt || 0).getTime(),
-          new Date(a.createdAt || 0).getTime()
-        ));
-        const timeB = new Date(Math.max(
-          new Date(b.updatedAt || b.createdAt || 0).getTime(),
-          new Date(b.createdAt || 0).getTime()
-        ));
+        const timeA = new Date(a.createdAt || a.updatedAt || 0);
+        const timeB = new Date(b.createdAt || b.updatedAt || 0);
         return timeB - timeA;
       })
       .slice(0, 4)
       .forEach((form, index) => {
-        // Determina se foi atualizado ou criado
-        const wasUpdated = form.updatedAt && form.createdAt && 
-          new Date(form.updatedAt).getTime() > new Date(form.createdAt).getTime();
-        
-        // Usa o timestamp mais recente
-        const formTime = wasUpdated 
-          ? new Date(form.updatedAt)
-          : form.createdAt 
-            ? new Date(form.createdAt)
+        const formTime = form.createdAt 
+          ? new Date(form.createdAt) 
+          : form.updatedAt 
+            ? new Date(form.updatedAt)
             : new Date(now.getTime() - ((index + 1) * 2 * 60 * 60 * 1000));
         
         activities.push({
           id: `form-${form.id}`,
           type: 'form',
-          title: `Formulário "${form.name}" ${wasUpdated ? 'atualizado' : 'criado'}`,
-          time: formTime.toISOString(),
+          title: `Formulário "${form.name}" ${form.updatedAt && form.updatedAt !== form.createdAt ? 'atualizado' : 'criado'}`,
+          time: formTime,
           icon: '📝',
           color: 'primary'
         });
       });
 
-    // Adiciona algumas atividades do sistema para preencher a lista
-    if (activities.length < 3) {
-      activities.push({
-        id: 'system-1',
-        type: 'system',
-        title: 'Sistema inicializado',
-        time: new Date(now.getTime() - (4 * 60 * 60 * 1000)).toISOString(),
-        icon: '🚀',
-        color: 'info'
-      });
-    }
 
-    if (activities.length < 4) {
-      activities.push({
-        id: 'system-2',
-        type: 'system',
-        title: 'Backup automático realizado',
-        time: new Date(now.getTime() - (8 * 60 * 60 * 1000)).toISOString(),
-        icon: '�',
-        color: 'success'
-      });
-    }
 
-    return activities
+    // Adiciona algumas atividades do sistema para dar mais realismo
+    activities.push({
+      id: 'system-1',
+      type: 'system',
+      title: 'Sistema atualizado para v2.1.0',
+      time: new Date(now.getTime() - (4 * 60 * 60 * 1000)), // 4h atrás
+      icon: '�',
+      color: 'info'
+    });
+
+    const sortedActivities = activities
       .sort((a, b) => new Date(b.time) - new Date(a.time))
       .slice(0, 5);
+    
+    console.log('✅ Atividades geradas:', sortedActivities.map(a => `${a.title} (${a.time.toLocaleString()})`));
+    
+    return sortedActivities;
   };
 
   const stats = [
@@ -496,9 +547,19 @@ const Dashboard = () => {
             {/* Recent Activity */}
             <Grid size={{ xs: 12, lg: 4 }}>
               <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🕒 Atividade Recente
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    🕒 Atividade Recente
+                  </Typography>
+                  <IconButton 
+                    size="small" 
+                    onClick={loadDashboardData} 
+                    sx={{ color: 'text.secondary' }}
+                    title="Atualizar atividades"
+                  >
+                    <Analytics />
+                  </IconButton>
+                </Box>
                 
                 <Stack spacing={2}>
                   {dashboardData.recentActivity.length > 0 ? (

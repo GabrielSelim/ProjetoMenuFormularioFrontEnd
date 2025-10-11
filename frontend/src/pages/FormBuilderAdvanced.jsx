@@ -261,7 +261,7 @@ const FormBuilderAdvanced = () => {
         {/* Configurações do Formulário */}
         <Paper sx={{ p: 2, mb: 2 }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 fullWidth
                 label="Nome do Formulário"
@@ -271,7 +271,7 @@ const FormBuilderAdvanced = () => {
                 size="small"
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 fullWidth
                 label="Título do Formulário"
@@ -281,7 +281,7 @@ const FormBuilderAdvanced = () => {
                 size="small"
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 fullWidth
                 select

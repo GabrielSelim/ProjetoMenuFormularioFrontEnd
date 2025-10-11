@@ -45,7 +45,7 @@ const Login = () => {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container component="main" maxWidth="xs">
       <Box
         sx={{
           minHeight: '100vh',
@@ -53,22 +53,30 @@ const Login = () => {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'background.default'
+          backgroundColor: 'background.default',
+          py: 3
         }}
       >
-        <Card sx={{ width: '100%', boxShadow: 3 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Box textAlign="center" mb={4}>
-              <Typography variant="h4" component="h1" gutterBottom>
+        <Card sx={{ 
+          width: '100%', 
+          maxWidth: 400, 
+          boxShadow: 3,
+          mx: { xs: 2, sm: 0 } // Margem lateral em mobile
+        }}>
+          <CardContent sx={{ 
+            p: { xs: 2, sm: 3 } // Padding menor em mobile
+          }}>
+            <Box textAlign="center" mb={3}>
+              <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 600 }}>
                 Sistema de Formulários
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body2" color="text.secondary">
                 Faça login para acessar o sistema
               </Typography>
             </Box>
 
             {error && (
-              <Alert severity="error" sx={{ mb: 3 }}>
+              <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
               </Alert>
             )}
@@ -86,6 +94,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
+                size="medium"
               />
               
               <TextField
@@ -100,33 +109,34 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
+                size="medium"
               />
               
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                size="large"
-                sx={{ mt: 3, mb: 2, py: 1.5 }}
+                size="medium"
+                sx={{ mt: 2.5, mb: 2, py: 1.2 }}
                 disabled={loading}
               >
                 {loading ? (
-                  <CircularProgress size={24} color="inherit" />
+                  <CircularProgress size={20} color="inherit" />
                 ) : (
                   'Entrar'
                 )}
               </Button>
             </Box>
 
-            <Box sx={{ mt: 4, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                <strong>Usuários de teste:</strong>
+            <Box sx={{ mt: 3, p: 1.5, bgcolor: 'grey.50', borderRadius: 1, border: '1px solid', borderColor: 'grey.200' }}>
+              <Typography variant="caption" color="text.secondary" gutterBottom sx={{ fontWeight: 600, display: 'block' }}>
+                Usuários de teste:
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                • Admin: admin@test.com / admin123
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                Admin: admin@test.com / admin123
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                • Usuário: user@test.com / user123
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                Usuário: user@test.com / user123
               </Typography>
             </Box>
           </CardContent>

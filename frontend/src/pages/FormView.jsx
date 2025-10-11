@@ -234,32 +234,7 @@ const FormView = () => {
             </Box>
           )}
 
-          {/* Informações adicionais */}
-          {form && (
-            <Paper sx={{ p: 3, mt: 4, bgcolor: 'background.paper' }}>
-              <Typography variant="h6" gutterBottom>
-                Informações do Formulário
-              </Typography>
-              <Box display="flex" flexDirection="column" gap={1}>
-                <Typography variant="body2">
-                  <strong>Nome:</strong> {form.name}
-                </Typography>
-                {form.description && (
-                  <Typography variant="body2">
-                    <strong>Descrição:</strong> {form.description}
-                  </Typography>
-                )}
-                <Typography variant="body2">
-                  <strong>Campos:</strong> {form.schema?.fields?.length || 0}
-                </Typography>
-                {form.createdAt && (
-                  <Typography variant="body2">
-                    <strong>Criado em:</strong> {new Date(form.createdAt).toLocaleString()}
-                  </Typography>
-                )}
-              </Box>
-            </Paper>
-          )}
+
 
           {/* Snackbar de sucesso */}
           <Snackbar
