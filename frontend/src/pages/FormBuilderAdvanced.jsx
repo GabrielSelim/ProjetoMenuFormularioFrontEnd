@@ -16,7 +16,7 @@ import {
 import {
   Save,
   Preview,
-  ArrowBack
+  ArrowBack  
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { formService } from '../api/formService';
@@ -31,6 +31,48 @@ const FormBuilderAdvanced = () => {
   const { id } = useParams(); // Para edição
   const formBuilderRef = useRef();
   const [isEditMode, setIsEditMode] = useState(false);
+
+  // Remover a DIV azul específica dinamicamente
+  useEffect(() => {
+    const removeBlueDivs = () => {
+      // Procurar e remover divs com o estilo específico
+      const allDivs = document.querySelectorAll('div');
+      allDivs.forEach(div => {
+        const style = div.getAttribute('style') || '';
+        if (
+          style.includes('rgba(114, 199, 255, 0.816)') ||
+          (style.includes('display: flex') && 
+           style.includes('flex-direction: column') && 
+           style.includes('background-color: rgba(114, 199, 255') &&
+           style.includes('border-radius: 6px') &&
+           style.includes('z-index: 1000'))
+        ) {
+          div.remove();
+        }
+      });
+    };
+
+    // Executar imediatamente
+    removeBlueDivs();
+
+    // Executar periodicamente para capturar elementos criados dinamicamente
+    const interval = setInterval(removeBlueDivs, 1000);
+
+    // Observer para detectar novos elementos
+    const observer = new MutationObserver(() => {
+      setTimeout(removeBlueDivs, 100);
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    return () => {
+      clearInterval(interval);
+      observer.disconnect();
+    };
+  }, []);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
