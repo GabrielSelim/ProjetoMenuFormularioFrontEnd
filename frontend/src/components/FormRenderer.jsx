@@ -22,6 +22,11 @@ import {
 import FormEngineRenderer from './FormEngineRenderer';
 
 const FormRenderer = ({ schema, onSubmit, initialData = {}, readOnly = false }) => {
+  console.log('FormRenderer recebeu schema:', schema);
+  console.log('Schema tipo:', typeof schema);
+  console.log('Schema tem fields:', !!schema?.fields);
+  console.log('Schema tem formEngineSchema:', !!schema?.formEngineSchema);
+  
   const { control, handleSubmit, formState: { errors }, watch } = useForm({
     defaultValues: initialData
   });
@@ -35,13 +40,26 @@ const FormRenderer = ({ schema, onSubmit, initialData = {}, readOnly = false }) 
   });
   
   if (formEngineComponent) {
+    console.log('Usando FormEngineRenderer');
     return formEngineComponent;
   }
 
-  if (!schema || !schema.fields) {
+  if (!schema || (!schema.fields && !schema.formEngineSchema)) {
+    console.warn('Schema inválido ou não encontrado:', schema);
     return (
       <Alert severity="warning">
         Schema do formulário não encontrado ou inválido.
+        <br />
+        Debug: {JSON.stringify({ hasSchema: !!schema, hasFields: !!schema?.fields, hasFormEngine: !!schema?.formEngineSchema })}
+      </Alert>
+    );
+  }
+
+  // Se não tem fields mas tem formEngineSchema, deixa o FormEngineRenderer lidar com isso
+  if (!schema.fields && schema.formEngineSchema) {
+    return (
+      <Alert severity="info">
+        Este formulário usa FormEngine.io. Se não está aparecendo, verifique a configuração.
       </Alert>
     );
   }

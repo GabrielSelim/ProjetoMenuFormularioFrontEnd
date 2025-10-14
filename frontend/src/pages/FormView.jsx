@@ -34,7 +34,9 @@ const FormView = () => {
       setLoading(true);
       setError('');
       
+      console.log('Carregando formulário ID:', id);
       const formData = await formService.getFormById(id);
+      console.log('Dados do formulário recebidos:', formData);
       
       if (!formData) {
         setError('Formulário não encontrado');
@@ -43,17 +45,26 @@ const FormView = () => {
       
       // Parse do schema JSON se necessário
       let parsedForm = { ...formData };
+      console.log('SchemaJson tipo:', typeof formData.schemaJson);
+      console.log('SchemaJson conteúdo:', formData.schemaJson);
+      
       if (formData.schemaJson && typeof formData.schemaJson === 'string') {
         try {
           parsedForm.schema = JSON.parse(formData.schemaJson);
+          console.log('Schema parseado:', parsedForm.schema);
         } catch (parseError) {
+          console.error('Erro ao parsear schema:', parseError);
           setError('Schema do formulário está em formato inválido');
           return;
         }
       } else if (formData.schemaJson && typeof formData.schemaJson === 'object') {
         parsedForm.schema = formData.schemaJson;
+        console.log('Schema já é objeto:', parsedForm.schema);
+      } else {
+        console.warn('Schema não encontrado ou inválido');
       }
       
+      console.log('Formulário final processado:', parsedForm);
       setForm(parsedForm);
     } catch (err) {
       console.error('Erro ao carregar formulário:', err);
@@ -68,19 +79,29 @@ const FormView = () => {
       setSubmitting(true);
       setError('');
       
-      await formService.submitForm(id, formData);
+      console.log('Enviando formulário:', { formId: id, formData });
+      
+      const response = await formService.submitForm(id, formData);
+      
+      console.log('Resposta do servidor:', response);
       
       setSuccess(true);
       
-      // Redireciona após 2 segundos
+      // Redireciona para as submissões imediatamente com filtro
       setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
+        navigate('/submissions', {
+          state: { 
+            message: 'Formulário enviado com sucesso!',
+            submissionId: response.id,
+            filterByForm: id // Adicionar filtro por formulário
+          }
+        });
+      }, 1500); // Reduzir tempo para 1.5s
       
     } catch (err) {
+      console.error('Erro ao enviar formulário:', err);
       setError(err.message || 'Erro ao enviar formulário');
-    } finally {
-      setSubmitting(false);
+      setSubmitting(false); // Importante: resetar estado em caso de erro
     }
   };
 
@@ -188,6 +209,15 @@ const FormView = () => {
             </Alert>
           )}
 
+          {/* Debug Info */}
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              Debug: form = {form ? 'existe' : 'null'}, 
+              form.schema = {form?.schema ? 'existe' : 'null'}, 
+              schemaJson = {form?.schemaJson ? 'existe' : 'null'}
+            </Typography>
+          </Alert>
+
           {/* Formulário */}
           {form && form.schema ? (
             <Box sx={{ position: 'relative' }}>
@@ -224,6 +254,12 @@ const FormView = () => {
                 onSubmit={handleSubmit}
               />
             </Box>
+          ) : form && form.schemaJson ? (
+            <Alert severity="warning">
+              Formulário encontrado mas schema não processado corretamente.
+              <br />
+              SchemaJson: {typeof form.schemaJson} - {JSON.stringify(form.schemaJson).substring(0, 200)}...
+            </Alert>
           ) : (
             <Box>
 

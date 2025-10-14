@@ -287,27 +287,32 @@ const FormList = () => {
                         size="small"
                         startIcon={<Visibility />}
                         onClick={() => handleView(form.id)}
+                        variant="contained"
+                        color="primary"
                       >
-                        Visualizar
+                        Abrir Formulário
+                      </Button>
+                      <Button
+                        size="small"
+                        startIcon={<Search />}
+                        onClick={() => handlePreview(form)}
+                        variant="outlined"
+                      >
+                        Preview
                       </Button>
                       <Button
                         size="small"
                         startIcon={<Edit />}
                         onClick={() => handleEdit(form.id)}
+                        variant="outlined"
                       >
                         Editar
                       </Button>
                       <IconButton
                         size="small"
-                        onClick={() => handlePreview(form)}
-                        color="primary"
-                      >
-                        <Search />
-                      </IconButton>
-                      <IconButton
-                        size="small"
                         onClick={() => handleDelete(form.id)}
                         color="error"
+                        sx={{ ml: 'auto' }}
                       >
                         <Delete />
                       </IconButton>

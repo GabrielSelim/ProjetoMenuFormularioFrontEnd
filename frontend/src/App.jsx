@@ -24,6 +24,11 @@ import FormList from './pages/FormList';
 import FormView from './pages/FormView';
 import AccessDenied from './pages/AccessDenied';
 
+// Submissions Pages
+import SubmissionsList from './pages/submissions/SubmissionsList';
+import SubmissionView from './pages/submissions/SubmissionView';
+import SubmissionEdit from './pages/submissions/SubmissionEdit';
+
 // Styles
 import './styles/global.css';
 
@@ -255,6 +260,34 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <FormView />
+                    </ProtectedRoute>
+                  } 
+                />
+
+                {/* Rotas de submissões - PROTEGIDAS */}
+                <Route 
+                  path="/submissions" 
+                  element={
+                    <ProtectedRoute>
+                      <SubmissionsList />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/submissions/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <SubmissionView />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/submissions/:id/edit" 
+                  element={
+                    <ProtectedRoute>
+                      <SubmissionEdit />
                     </ProtectedRoute>
                   } 
                 />

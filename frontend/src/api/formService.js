@@ -61,10 +61,10 @@ export const formService = {
     }
   },
 
-  // Submete dados de um formulário
+  // Submete dados de um formulário (cria submissão)
   submitForm: async (formId, formData) => {
     try {
-      const response = await api.post(`/Submissions`, {
+      const response = await api.post(`/SubmissoesFormulario`, {
         formId,
         dataJson: JSON.stringify(formData)
       });
@@ -78,7 +78,9 @@ export const formService = {
   // Busca submissions de um formulário
   getFormSubmissions: async (formId) => {
     try {
-      const response = await api.get(`/Submissions/form/${formId}`);
+      const response = await api.get(`/SubmissoesFormulario`, {
+        params: { formId }
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Erro ao buscar submissions' };
@@ -88,7 +90,7 @@ export const formService = {
   // Busca submissions do usuário atual
   getMySubmissions: async () => {
     try {
-      const response = await api.get('/Submissions/my-submissions');
+      const response = await api.get('/SubmissoesFormulario');
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Erro ao buscar minhas submissions' };

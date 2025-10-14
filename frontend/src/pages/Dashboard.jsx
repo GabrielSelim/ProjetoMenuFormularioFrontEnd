@@ -123,28 +123,8 @@ const Dashboard = () => {
         });
       });
 
-    // Adiciona algumas atividades do sistema para preencher a lista
-    if (activities.length < 3) {
-      activities.push({
-        id: 'system-1',
-        type: 'system',
-        title: 'Sistema inicializado',
-        time: new Date(now.getTime() - (4 * 60 * 60 * 1000)).toISOString(),
-        icon: '🚀',
-        color: 'info'
-      });
-    }
-
-    if (activities.length < 4) {
-      activities.push({
-        id: 'system-2',
-        type: 'system',
-        title: 'Backup automático realizado',
-        time: new Date(now.getTime() - (8 * 60 * 60 * 1000)).toISOString(),
-        icon: '�',
-        color: 'success'
-      });
-    }
+    // REMOVIDO: Dados mockados do sistema
+    // Agora mostra apenas atividades reais dos formulários e menus
 
     return activities
       .sort((a, b) => new Date(b.time) - new Date(a.time))

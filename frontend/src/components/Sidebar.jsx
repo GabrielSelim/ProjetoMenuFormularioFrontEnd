@@ -25,7 +25,8 @@ import {
   Folder,
   InsertDriveFile,
   Link as LinkIcon,
-  Build
+  Build,
+  Assignment
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMenu } from '../context/MenuContext';
@@ -64,6 +65,7 @@ const getMenuIcon = (iconName, type) => {
     file: <InsertDriveFile />,
     link: <LinkIcon />,
     build: <Build />,
+    assignment: <Assignment />,
   };
 
   // Prioriza emoji se disponível, senão usa Material UI
@@ -228,9 +230,10 @@ const Sidebar = ({ mobileOpen, onMobileClose }) => {
   const getDefaultMenus = () => {
     const allMenus = [
       { id: 'dashboard', name: 'Dashboard', urlOrPath: '/dashboard', contentType: 'route', icon: 'dashboard', order: 0 },
-      { id: 'admin-section', name: 'ADMINISTRAÇÃO', contentType: 'section', order: 1, requiresRole: ['admin', 'manager'] },
-      { id: 'admin-menus', name: 'Gerenciar Menus', urlOrPath: '/admin/menus', contentType: 'route', icon: 'settings', order: 2, requiresRole: ['admin', 'manager'] },
-      { id: 'form-list', name: 'Lista de Formulários', urlOrPath: '/forms', contentType: 'route', icon: 'description', order: 3, requiresRole: ['admin', 'manager'] }
+      { id: 'submissions', name: 'Minhas Submissões', urlOrPath: '/submissions', contentType: 'route', icon: 'assignment', order: 1 },
+      { id: 'admin-section', name: 'ADMINISTRAÇÃO', contentType: 'section', order: 2, requiresRole: ['admin', 'manager'] },
+      { id: 'admin-menus', name: 'Gerenciar Menus', urlOrPath: '/admin/menus', contentType: 'route', icon: 'settings', order: 3, requiresRole: ['admin', 'manager'] },
+      { id: 'form-list', name: 'Lista de Formulários', urlOrPath: '/forms', contentType: 'route', icon: 'description', order: 4, requiresRole: ['admin', 'manager'] }
     ];
 
     // Filtra menus baseado no role do usuário
