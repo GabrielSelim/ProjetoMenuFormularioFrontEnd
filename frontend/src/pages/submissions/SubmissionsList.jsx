@@ -533,8 +533,8 @@ const SubmissionsList = () => {
             </Alert>
           )}
 
-          <Card sx={{ mb: 3, position: 'relative', zIndex: 1 }}>
-            <CardContent sx={{ pb: 2 }}>
+          <Card sx={{ mb: 3, position: 'relative', zIndex: 1, overflow: 'visible' }}>
+            <CardContent sx={{ pb: 2, overflow: 'visible' }}>
               <Box sx={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
@@ -560,11 +560,13 @@ const SubmissionsList = () => {
               </Box>
               
               <Box sx={{
-                display: { xs: showMobileFilters ? 'block' : 'none', md: 'block' }
+                display: { xs: showMobileFilters ? 'block' : 'none', md: 'block' },
+                overflow: 'visible'
               }}>
                 <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 3 }}>
-                  <Grid item xs={12} sm={12} md={5}>
+                  <Grid item xs={12} sm={12} md={5} sx={{ position: 'relative' }}>
                     <Autocomplete
+                      disablePortal
                       options={forms}
                       getOptionLabel={(option) => option.name || option.title || `Formulário ${option.id}`}
                       value={selectedForm}
@@ -572,10 +574,34 @@ const SubmissionsList = () => {
                         setSelectedForm(newValue);
                         setFilters(prev => ({ ...prev, formId: newValue ? newValue.id : '' }));
                       }}
+                      fullWidth
+                      size="small"
                       sx={{ 
                         width: { xs: '100%', sm: '100%', md: 400 },
-                        minWidth: 300
-                      }}
+                        minWidth: 300,
+                        position: 'relative',
+                        '& .MuiAutocomplete-paper': {
+                          minWidth: '400px !important',
+                          maxHeight: '300px',
+                          overflow: 'auto',
+                          zIndex: 10000,
+                          boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '4px',
+                          backgroundColor: 'white',
+                          position: 'absolute !important',
+                          top: '100% !important',
+                          left: '0 !important',
+                          right: 'auto !important',
+                          marginTop: '4px !important',
+                          transform: 'none !important',
+                          transition: 'none !important',
+                          animation: 'none !important'
+                        },
+                        '& .MuiAutocomplete-listbox': {
+                          maxHeight: '300px'
+                        }
+                      }}                 
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -586,15 +612,6 @@ const SubmissionsList = () => {
                         />
                       )}
                       noOptionsText="Nenhum formulário encontrado"
-                      clearText="Limpar"
-                      openText="Abrir"
-                      closeText="Fechar"
-                      size="small"
-                      ListboxProps={{
-                        style: {
-                          maxHeight: 200,
-                        },
-                      }}
                     />
                   </Grid>
                   
@@ -606,10 +623,13 @@ const SubmissionsList = () => {
                       fullWidth
                       value={filters.status}
                       onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                      SelectProps={{ native: true }}
+                      SelectProps={{ 
+                        native: true,
+                        displayEmpty: true
+                      }}
                       InputLabelProps={{ shrink: true }}
                     >
-                      <option value=""></option>
+                      <option value="">Selecione o status</option>
                       <option value="0">Rascunho</option>
                       <option value="1">Enviado</option>
                       <option value="2">Em Análise</option>
