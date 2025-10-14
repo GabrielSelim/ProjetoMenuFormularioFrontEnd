@@ -572,12 +572,17 @@ const SubmissionsList = () => {
                         setSelectedForm(newValue);
                         setFilters(prev => ({ ...prev, formId: newValue ? newValue.id : '' }));
                       }}
+                      sx={{ 
+                        width: { xs: '100%', sm: '100%', md: 400 },
+                        minWidth: 300
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           label="Formulário"
                           size="small"
                           placeholder="Digite para buscar..."
+                          InputLabelProps={{ shrink: true }}
                         />
                       )}
                       noOptionsText="Nenhum formulário encontrado"
@@ -585,7 +590,6 @@ const SubmissionsList = () => {
                       openText="Abrir"
                       closeText="Fechar"
                       size="small"
-                      fullWidth
                       ListboxProps={{
                         style: {
                           maxHeight: 200,
