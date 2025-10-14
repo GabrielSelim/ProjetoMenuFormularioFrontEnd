@@ -477,49 +477,25 @@ const SubmissionsList = () => {
 
   return (
     <Layout>
-      <Container maxWidth="xl" sx={{ 
-        py: { xs: 2, md: 3 }, 
-        px: { xs: 2, md: 3 },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: { xs: 'center', sm: 'stretch' }
-      }}>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between', 
-            alignItems: { xs: 'stretch', sm: 'flex-start' },
-            mb: 3,
-            gap: 2
-          }}>
-            <Box sx={{ flex: 1 }}>
-              <Typography 
-                variant="h4" 
-                component="h1" 
-                gutterBottom
-                sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}
+      <Container maxWidth="xl">
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+            <Typography variant="h4" component="h1">
+              📋 Minhas Submissões
+            </Typography>
+            <Box display="flex" gap={2}>
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => navigate('/forms')}
               >
-                📋 Minhas Submissões
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {pagination.totalItens} submissão(ões) encontrada(s)
-              </Typography>
+                Nova Submissão
+              </Button>
             </Box>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => navigate('/forms')}
-              size="large"
-              sx={{ 
-                width: { xs: '100%', sm: 'auto' },
-                minWidth: { sm: '180px' },
-                whiteSpace: 'nowrap',
-                flexShrink: 0
-              }}
-            >
-              Nova Submissão
-            </Button>
           </Box>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            {pagination.totalItens} submissão(ões) encontrada(s)
+          </Typography>
 
           {/* Mensagens de Erro */}
           {error && (
@@ -558,11 +534,8 @@ const SubmissionsList = () => {
                 display: { xs: showMobileFilters ? 'block' : 'none', md: 'block' },
                 overflow: 'visible'
               }}>
-                <Grid container spacing={{ xs: 2, md: 3 }} sx={{ 
-                  mb: 3,
-                  justifyContent: { xs: 'center', sm: 'flex-start' }
-                }}>
-                  <Grid item xs={12} sm={12} md={5} sx={{ position: 'relative' }}>
+                <Grid container spacing={3} sx={{ mb: 3 }}>
+                  <Grid size={{ xs: 12, sm: 12, md: 4 }} sx={{ position: 'relative' }}>
                     <Autocomplete
                       disablePortal
                       options={forms}
@@ -613,7 +586,7 @@ const SubmissionsList = () => {
                     />
                   </Grid>
                   
-                  <Grid item xs={12} sm={12} md={2}>
+                  <Grid size={{ xs: 12, sm: 12, md: 2.5 }}>
                     <TextField
                       select
                       label="Status"
@@ -637,7 +610,7 @@ const SubmissionsList = () => {
                     </TextField>
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={2.5}>
+                  <Grid size={{ xs: 12, sm: 6, md: 2.75 }}>
                     <TextField
                       label="Data Inicial"
                       type="date"
@@ -649,7 +622,7 @@ const SubmissionsList = () => {
                     />
                   </Grid>
                   
-                  <Grid item xs={12} sm={6} md={2.5}>
+                  <Grid size={{ xs: 12, sm: 6, md: 2.75 }}>
                     <TextField
                       label="Data Final"
                       type="date"
@@ -718,11 +691,9 @@ const SubmissionsList = () => {
                   </Button>
                 </Alert>
               ) : (
-                <Grid container spacing={{ xs: 2, md: 3 }} sx={{
-                  justifyContent: { xs: 'center', sm: 'flex-start' }
-                }}>
+                <Grid container spacing={3}>
                   {Array.isArray(submissions) && submissions.map((submission) => (
-                    <Grid item xs={12} sm={6} md={4} key={submission.id}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={submission.id}>
                       <SubmissionCard
                         submission={submission}
                         onView={handleView}

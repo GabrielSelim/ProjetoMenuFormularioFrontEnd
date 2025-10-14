@@ -25,7 +25,9 @@ import {
   Container,
   Switch,
   FormControlLabel,
-  Grid
+  Grid,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Add,
@@ -41,6 +43,8 @@ import { formService } from '../api/formService';
 import Layout from '../components/Layout';
 
 const MenuManager = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { menus, loadAllMenus, createMenu, updateMenu, deleteMenu, reorderMenus, loading } = useMenu();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
@@ -313,20 +317,15 @@ const MenuManager = () => {
   // Loading state
   if (loading && menus.length === 0) {
     return (
-      <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh' }}>
-        <Header />
-        <Sidebar />
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginLeft: '260px',
-            marginTop: '64px',
-          }}
-        >
+      <Layout>
+        <Container maxWidth="xl" sx={{ 
+          px: { xs: 2, sm: 3 }, 
+          py: { xs: 2, sm: 3 },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '50vh'
+        }}>
           <Box textAlign="center">
             <Typography variant="h6" gutterBottom>
               Carregando menus...
@@ -335,28 +334,44 @@ const MenuManager = () => {
               <div>🔄 Aguarde...</div>
             </Box>
           </Box>
-        </Box>
-      </Box>
+        </Container>
+      </Layout>
     );
   }
 
   return (
     <Layout>
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
           <Box mb={3}>
             <Typography variant="h4" component="h1" gutterBottom>
               Gerenciamento de Menus - Sanz Tech
             </Typography>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="body2" color="text.secondary">
+            <Box 
+              display="flex" 
+              flexDirection={{ xs: 'column', sm: 'row' }}
+              justifyContent="space-between" 
+              alignItems={{ xs: 'stretch', sm: 'center' }}
+              gap={{ xs: 2, sm: 0 }}
+            >
+              <Typography variant="body2" color="text.secondary" sx={{ mb: { xs: 1, sm: 0 } }}>
                 Configure os menus do sistema e organize a navegação
               </Typography>
-              <Box display="flex" gap={2}>
+              <Box 
+                display="flex" 
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                gap={2}
+                width={{ xs: '100%', sm: 'auto' }}
+              >
                 <Button
                   variant="contained"
                   startIcon={<Add />}
                   onClick={() => handleOpenDialog()}
-                  sx={{ borderRadius: 2 }}
+                  sx={{ 
+                    borderRadius: 2,
+                    minHeight: 48,
+                    fontSize: { xs: '0.875rem', sm: '0.875rem' },
+                    width: { xs: '100%', sm: 'auto' }
+                  }}
                 >
                   Novo Menu
                 </Button>
@@ -364,7 +379,12 @@ const MenuManager = () => {
                   <Button
                     variant="outlined"
                     onClick={createQuickFormMenu}
-                    sx={{ borderRadius: 2 }}
+                    sx={{ 
+                      borderRadius: 2,
+                      minHeight: 48,
+                      fontSize: { xs: '0.875rem', sm: '0.875rem' },
+                      width: { xs: '100%', sm: 'auto' }
+                    }}
                   >
                     Menu Rápido p/ Formulário
                   </Button>
@@ -380,17 +400,28 @@ const MenuManager = () => {
           )}
 
           <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer>
-              <Table stickyHeader>
+            {/* Indicador Mobile */}
+            <Box sx={{ 
+              display: { xs: 'block', sm: 'none' }, 
+              p: 2, 
+              backgroundColor: 'primary.main', 
+              color: 'primary.contrastText' 
+            }}>
+              <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                📱 Deslize horizontalmente para ver todos os campos
+              </Typography>
+            </Box>
+            <TableContainer sx={{ overflowX: 'auto' }}>
+                <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: 50 }}>Ordem</TableCell>
-                    <TableCell>Nome</TableCell>
-                    <TableCell>Tipo</TableCell>
-                    <TableCell>URL/Caminho</TableCell>
-                    <TableCell>Permissões</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Ações</TableCell>
+                    <TableCell sx={{ width: 50, minWidth: 50 }}>Ordem</TableCell>
+                    <TableCell sx={{ minWidth: 150 }}>Nome</TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>Tipo</TableCell>
+                    <TableCell sx={{ minWidth: 200, display: { xs: 'none', sm: 'table-cell' } }}>URL/Caminho</TableCell>
+                    <TableCell sx={{ minWidth: 120, display: { xs: 'none', md: 'table-cell' } }}>Permissões</TableCell>
+                    <TableCell sx={{ minWidth: 100 }}>Status</TableCell>
+                    <TableCell sx={{ minWidth: 120 }}>Ações</TableCell>
                   </TableRow>
                 </TableHead>
                 <DragDropContext onDragEnd={handleDragEnd}>
@@ -453,12 +484,12 @@ const MenuManager = () => {
                                       variant="outlined"
                                     />
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                                     <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                       {getMenuDescription(menu)}
                                     </Typography>
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                                     {menu.rolesAllowed ? (
                                       <Box display="flex" flexWrap="wrap" gap={0.5}>
                                         {menu.rolesAllowed.split(',').slice(0, 2).map(roleValue => {
@@ -495,11 +526,20 @@ const MenuManager = () => {
                                     </Box>
                                   </TableCell>
                                   <TableCell>
-                                    <Box display="flex" gap={1}>
+                                    <Box 
+                                      display="flex" 
+                                      gap={{ xs: 0.5, sm: 1 }}
+                                      flexDirection={{ xs: 'column', sm: 'row' }}
+                                      alignItems="center"
+                                    >
                                       <IconButton
                                         size="small"
                                         onClick={() => handleOpenDialog(menu)}
                                         color="primary"
+                                        sx={{ 
+                                          minWidth: { xs: 36, sm: 'auto' },
+                                          minHeight: { xs: 36, sm: 'auto' }
+                                        }}
                                       >
                                         <Edit fontSize="small" />
                                       </IconButton>
@@ -507,6 +547,10 @@ const MenuManager = () => {
                                         size="small"
                                         onClick={() => handleDelete(menu.id)}
                                         color="error"
+                                        sx={{ 
+                                          minWidth: { xs: 36, sm: 'auto' },
+                                          minHeight: { xs: 36, sm: 'auto' }
+                                        }}
                                       >
                                         <Delete fontSize="small" />
                                       </IconButton>
@@ -527,7 +571,19 @@ const MenuManager = () => {
           </Paper>
 
           {/* Dialog para criar/editar menu */}
-          <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+          <Dialog 
+            open={dialogOpen} 
+            onClose={handleCloseDialog} 
+            maxWidth="md" 
+            fullWidth
+            fullScreen={isMobile}
+            PaperProps={{
+              sx: {
+                m: { xs: 0, sm: 2 },
+                maxHeight: { xs: '100vh', sm: '90vh' }
+              }
+            }}
+          >
             <DialogTitle>
               {editingMenu ? 'Editar Menu' : 'Adicionar Menu'}
             </DialogTitle>

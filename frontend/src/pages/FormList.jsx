@@ -166,7 +166,7 @@ const FormList = () => {
 
   return (
     <Layout>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
             <Typography variant="h4" component="h1">
               Lista de Formulários

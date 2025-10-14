@@ -109,57 +109,86 @@ const SubmissionCard = ({
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <CardContent sx={{ flexGrow: 1 }}>
+      <CardContent sx={{ flexGrow: 1, pb: 1 }}>
         {/* Header com Status */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Typography variant="h6" component="h3" sx={{ flexGrow: 1, mr: 2 }}>
+          <Typography variant="h6" component="h3" sx={{ 
+            flexGrow: 1, 
+            mr: 2, 
+            fontSize: { xs: '1.125rem', md: '1rem' },
+            lineHeight: 1.3
+          }}>
             {submission.formName}
           </Typography>
           <SubmissionStatus status={submission.status} />
         </Box>
 
-        {/* Informações Básicas */}
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          <strong>ID:</strong> {submission.id}
-        </Typography>
-        
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          <strong>Usuário:</strong> {submission.userName}
-        </Typography>
+        {/* Layout responsivo das informações */}
+        <Box sx={{ 
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+          gap: { xs: 1, md: 2 },
+          mb: 1
+        }}>
+          {/* Coluna 1 */}
+          <Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
+              <strong>ID:</strong> {submission.id}
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
+              <strong>Usuário:</strong> {submission.userName}
+            </Typography>
 
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          <strong>Criado em:</strong> {new Date(submission.createdAt).toLocaleDateString('pt-BR')}
-        </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
+              <strong>Criado:</strong> {new Date(submission.createdAt).toLocaleDateString('pt-BR')}
+            </Typography>
+          </Box>
 
-        {submission.dataSubmissao && (
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            <strong>Submetido em:</strong> {new Date(submission.dataSubmissao).toLocaleDateString('pt-BR')}
-          </Typography>
-        )}
+          {/* Coluna 2 */}
+          <Box>
+            {submission.dataSubmissao && (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
+                <strong>Submetido:</strong> {new Date(submission.dataSubmissao).toLocaleDateString('pt-BR')}
+              </Typography>
+            )}
 
-        {submission.dataAprovacao && (
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            <strong>Aprovado em:</strong> {new Date(submission.dataAprovacao).toLocaleDateString('pt-BR')}
-          </Typography>
-        )}
+            {submission.dataAprovacao && (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
+                <strong>Aprovado:</strong> {new Date(submission.dataAprovacao).toLocaleDateString('pt-BR')}
+              </Typography>
+            )}
 
-        {submission.motivoRejeicao && (
-          <Typography variant="body2" color="error" gutterBottom>
-            <strong>Motivo Rejeição:</strong> {submission.motivoRejeicao}
-          </Typography>
-        )}
+            {submission.motivoRejeicao && (
+              <Typography variant="body2" color="error" sx={{ 
+                mb: 0.5, 
+                fontSize: '0.75rem',
+                wordBreak: 'break-word'
+              }}>
+                <strong>Rejeição:</strong> {submission.motivoRejeicao}
+              </Typography>
+            )}
+          </Box>
+        </Box>
       </CardContent>
 
-      <CardActions sx={{ justifyContent: 'space-between', pt: 0 }}>
+      <CardActions sx={{ 
+        justifyContent: 'space-between', 
+        pt: 0, 
+        px: 2, 
+        pb: 1,
+        minHeight: { xs: 'auto', md: 48 }
+      }}>
         {/* Ações Principais */}
-        <Box>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
           <Tooltip title="Visualizar">
             <IconButton 
               size="small" 
               onClick={() => handleAction('view')}
               color="primary"
+              sx={{ fontSize: { xs: '1rem', md: '0.875rem' } }}
             >
-              <Visibility />
+              <Visibility fontSize="small" />
             </IconButton>
           </Tooltip>
 
@@ -169,8 +198,9 @@ const SubmissionCard = ({
                 size="small" 
                 onClick={() => handleAction('edit')}
                 color="primary"
+                sx={{ fontSize: { xs: '1rem', md: '0.875rem' } }}
               >
-                <Edit />
+                <Edit fontSize="small" />
               </IconButton>
             </Tooltip>
           )}
@@ -179,9 +209,13 @@ const SubmissionCard = ({
             <Tooltip title="Enviar">
               <Button
                 size="small"
-                startIcon={<Send />}
+                startIcon={<Send fontSize="small" />}
                 onClick={() => handleAction('enviar')}
                 color="primary"
+                sx={{ 
+                  fontSize: { xs: '0.75rem', md: '0.6875rem' },
+                  minWidth: { xs: 'auto', md: 60 }
+                }}
               >
                 Enviar
               </Button>
@@ -196,8 +230,9 @@ const SubmissionCard = ({
               size="small"
               onClick={handleMenuOpen}
               aria-label="mais ações"
+              sx={{ fontSize: { xs: '1rem', md: '0.875rem' } }}
             >
-              <MoreVert />
+              <MoreVert fontSize="small" />
             </IconButton>
             
             <Menu

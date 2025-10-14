@@ -165,7 +165,7 @@ const FormView = () => {
           marginLeft: '0 !important',
         }}
       >
-        <Container maxWidth="md">
+        <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4, lg: 8 } }}>
           {/* Cabeçalho */}
           <Box display="flex" alignItems="center" gap={2} mb={4}>
             <Button
@@ -175,16 +175,6 @@ const FormView = () => {
             >
               Voltar
             </Button>
-            <Box flexGrow={1}>
-              <Typography variant="h4" component="h1">
-                {form?.name || 'Formulário'}
-              </Typography>
-              {form?.description && (
-                <Typography variant="body1" color="text.secondary">
-                  {form.description}
-                </Typography>
-              )}
-            </Box>
           </Box>
 
           {/* Mensagens de erro */}
@@ -196,7 +186,20 @@ const FormView = () => {
 
           {/* Formulário */}
           {form && form.schema ? (
-            <Box sx={{ position: 'relative' }}>
+            <Box sx={{ 
+              position: 'relative',
+              width: '100%',
+              '& .formio-form': {
+                maxWidth: 'none !important',
+                width: '100% !important'
+              },
+              '& .form-group': {
+                maxWidth: 'none !important'
+              },
+              '& .card': {
+                maxWidth: 'none !important'
+              }
+            }}>
 
               
               {submitting && (
@@ -228,6 +231,7 @@ const FormView = () => {
                   submitText: 'Enviar Formulário'
                 }}
                 onSubmit={handleSubmit}
+                style={{ width: '100%', maxWidth: 'none' }}
               />
             </Box>
           ) : form && form.schemaJson ? (
