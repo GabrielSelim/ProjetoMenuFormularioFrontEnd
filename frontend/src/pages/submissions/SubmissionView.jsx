@@ -348,22 +348,18 @@ const SubmissionView = () => {
               </Avatar>
             </ListItemAvatar>
             <ListItemText
-              primary={
-                <Typography variant="subtitle1">
-                  {getAcaoLabel(item.acao)} - {item.usuarioName}
-                </Typography>
-              }
+              primary={`${getAcaoLabel(item.acao)} - ${item.usuarioName}`}
               secondary={
-                <>
-                  <Typography variant="body2" color="text.secondary">
+                <Box component="span">
+                  <Box component="span" sx={{ display: 'block', color: 'text.secondary', fontSize: '0.875rem' }}>
                     {new Date(item.dataAcao).toLocaleString('pt-BR')}
-                  </Typography>
+                  </Box>
                   {item.comentario && (
-                    <Typography variant="body2" sx={{ mt: 1 }}>
+                    <Box component="span" sx={{ display: 'block', mt: 1, fontSize: '0.875rem' }}>
                       {item.comentario}
-                    </Typography>
+                    </Box>
                   )}
-                </>
+                </Box>
               }
             />
           </ListItem>
