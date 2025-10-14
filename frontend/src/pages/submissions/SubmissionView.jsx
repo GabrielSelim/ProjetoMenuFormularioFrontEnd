@@ -52,6 +52,7 @@ const SubmissionView = () => {
 
   // Estados principais
   const [submission, setSubmission] = useState(null);
+  const [formSchema, setFormSchema] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -78,9 +79,25 @@ const SubmissionView = () => {
       
       const data = await submissionService.getById(id);
       setSubmission(data);
+
+      // Carregar schema do formulário para renderização completa
+      if (data.formId) {
+        try {
+          const { formService } = await import('../../api/formService');
+          const formDetails = await formService.getFormById(data.formId);
+          
+          if (formDetails.schemaJson) {
+            const parsedSchema = typeof formDetails.schemaJson === 'string' 
+              ? JSON.parse(formDetails.schemaJson) 
+              : formDetails.schemaJson;
+            setFormSchema(parsedSchema);
+          }
+        } catch (schemaError) {
+          // Continuar sem o schema
+        }
+      }
     } catch (error) {
       setError(error.message || 'Erro ao carregar submissão');
-      console.error('Erro ao carregar submissão:', error);
     } finally {
       setLoading(false);
     }
@@ -203,7 +220,7 @@ const SubmissionView = () => {
 
     try {
       const formData = JSON.parse(submission.dataJson);
-      
+
       return (
         <Paper sx={{ p: 0, overflow: 'hidden' }}>
           {/* Header do Formulário */}
@@ -221,17 +238,26 @@ const SubmissionView = () => {
               <Description /> {submission.formName}
             </Typography>
             <Typography variant="body1" sx={{ opacity: 0.9 }}>
-              Dados preenchidos pelo usuário
+              Visualização dos dados preenchidos
             </Typography>
           </Box>
           
-          {/* Conteúdo do Formulário */}
+          {/* Renderização do Formulário */}
           <Box sx={{ p: 3 }}>
             {Object.entries(formData).length === 0 ? (
               <Alert severity="info">
                 Nenhum dado foi preenchido neste formulário.
               </Alert>
+            ) : formSchema ? (
+              // Usar FormRenderer se tiver schema
+              <FormRenderer
+                schema={formSchema}
+                initialData={formData}
+                readOnly={true}
+                onSubmit={null}
+              />
             ) : (
+              // Fallback para exibição simples dos dados
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 {Object.entries(formData).map(([key, value], index) => {
                   // Formatação mais inteligente dos valores
@@ -463,112 +489,55 @@ const SubmissionView = () => {
             </Alert>
           )}
 
-          <Grid container spacing={3}>
-            {/* Dados Principais */}
-            <Grid item xs={12} md={8}>
-              {renderFormData()}
-            </Grid>
-
-            {/* Informações Laterais */}
-            <Grid item xs={12} md={4}>
-              {/* Status e Informações */}
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Assignment /> Informações
-                  </Typography>
-                  
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
+          {/* Card de Status Compacto */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent sx={{ p: 3 }}>
+              <Grid container spacing={3} alignItems="center">
+                <Grid item xs={12} sm={6} md={3}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                       Status:
                     </Typography>
                     <SubmissionStatus status={submission?.status} />
                   </Box>
-                  
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      <Person sx={{ fontSize: 16, mr: 0.5 }} />
+                </Grid>
+                
+                <Grid item xs={12} sm={6} md={4}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                       Usuário:
                     </Typography>
-                    <Typography variant="body1">
-                      {submission?.userName} ({submission?.userEmail})
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {submission?.userName}
                     </Typography>
                   </Box>
-                  
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      <CalendarToday sx={{ fontSize: 16, mr: 0.5 }} />
-                      Criado em:
-                    </Typography>
-                    <Typography variant="body1">
-                      {submission?.createdAt && new Date(submission.createdAt).toLocaleString('pt-BR')}
-                    </Typography>
-                  </Box>
-                  
-                  {submission?.dataSubmissao && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        Submetido em:
-                      </Typography>
-                      <Typography variant="body1">
-                        {new Date(submission.dataSubmissao).toLocaleString('pt-BR')}
-                      </Typography>
-                    </Box>
-                  )}
-                  
-                  {submission?.dataAprovacao && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        Aprovado em:
-                      </Typography>
-                      <Typography variant="body1">
-                        {new Date(submission.dataAprovacao).toLocaleString('pt-BR')}
-                      </Typography>
-                      {submission.usuarioAprovadorName && (
-                        <Typography variant="body2" color="text.secondary">
-                          Por: {submission.usuarioAprovadorName}
-                        </Typography>
-                      )}
-                    </Box>
-                  )}
-                  
-                  {submission?.motivoRejeicao && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="error" gutterBottom>
-                        Motivo da Rejeição:
-                      </Typography>
-                      <Typography variant="body1">
-                        {submission.motivoRejeicao}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                </Grid>
+                
+                <Grid item xs={12} sm={6} md={2}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                       Versão:
                     </Typography>
-                    <Typography variant="body1">
-                      {submission?.versao}
+                    <Typography variant="h6" color="primary.main">
+                      v{submission?.versao}
                     </Typography>
                   </Box>
-                </CardContent>
-              </Card>
-
-              {/* Ações de Workflow */}
-              {availableActions.length > 0 && (
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      ⚡ Ações Disponíveis
-                    </Typography>
-                    
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                </Grid>
+                
+                <Grid item xs={12} sm={6} md={3}>
+                  {availableActions.length > 0 && (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexWrap: 'wrap', 
+                      gap: 1, 
+                      justifyContent: { xs: 'flex-start', md: 'flex-end' }
+                    }}>
                       {availableActions.includes('enviar') && (
                         <Button
                           variant="contained"
                           startIcon={<Send />}
                           onClick={() => handleWorkflowAction('enviar')}
-                          fullWidth
+                          size="small"
                         >
                           Enviar
                         </Button>
@@ -579,10 +548,10 @@ const SubmissionView = () => {
                           variant="contained"
                           startIcon={<Assignment />}
                           onClick={() => handleWorkflowAction('colocarAnalise')}
-                          fullWidth
                           color="warning"
+                          size="small"
                         >
-                          Colocar em Análise
+                          Análise
                         </Button>
                       )}
                       
@@ -591,8 +560,8 @@ const SubmissionView = () => {
                           variant="contained"
                           startIcon={<CheckCircle />}
                           onClick={() => handleWorkflowAction('aprovar')}
-                          fullWidth
                           color="success"
+                          size="small"
                         >
                           Aprovar
                         </Button>
@@ -603,8 +572,8 @@ const SubmissionView = () => {
                           variant="outlined"
                           startIcon={<Cancel />}
                           onClick={() => handleWorkflowAction('rejeitar')}
-                          fullWidth
                           color="error"
+                          size="small"
                         >
                           Rejeitar
                         </Button>
@@ -615,18 +584,79 @@ const SubmissionView = () => {
                           variant="outlined"
                           startIcon={<Cancel />}
                           onClick={() => handleWorkflowAction('cancelar')}
-                          fullWidth
                           color="error"
+                          size="small"
                         >
                           Cancelar
                         </Button>
                       )}
                     </Box>
+                  )}
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
+          {/* Formulário Preenchido - Largura Total */}
+          <Box sx={{ mb: 3 }}>
+            {renderFormData()}
+          </Box>
+
+          {/* Informações Adicionais e Histórico */}
+          <Grid container spacing={3}>
+            {/* Detalhes Adicionais */}
+            {(submission?.dataSubmissao || submission?.dataAprovacao || submission?.motivoRejeicao) && (
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      📋 Detalhes Adicionais
+                    </Typography>
+                    
+                    {submission?.dataSubmissao && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          Submetido em:
+                        </Typography>
+                        <Typography variant="body1">
+                          {new Date(submission.dataSubmissao).toLocaleString('pt-BR')}
+                        </Typography>
+                      </Box>
+                    )}
+                    
+                    {submission?.dataAprovacao && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          Aprovado em:
+                        </Typography>
+                        <Typography variant="body1">
+                          {new Date(submission.dataAprovacao).toLocaleString('pt-BR')}
+                        </Typography>
+                        {submission.usuarioAprovadorName && (
+                          <Typography variant="body2" color="text.secondary">
+                            Por: {submission.usuarioAprovadorName}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                    
+                    {submission?.motivoRejeicao && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="body2" color="error" gutterBottom>
+                          Motivo da Rejeição:
+                        </Typography>
+                        <Typography variant="body1">
+                          {submission.motivoRejeicao}
+                        </Typography>
+                      </Box>
+                    )}
                   </CardContent>
                 </Card>
-              )}
+              </Grid>
+            )}
 
-              {/* Histórico */}
+            {/* Histórico */}
+            <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

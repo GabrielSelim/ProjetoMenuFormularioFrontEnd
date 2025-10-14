@@ -46,6 +46,7 @@ const FormRenderer = ({ schema, onSubmit, initialData = {}, readOnly = false }) 
         description={schema?.description}
         initialData={initialData}
         data={initialData}
+        readOnly={readOnly}
       />
     );
   }

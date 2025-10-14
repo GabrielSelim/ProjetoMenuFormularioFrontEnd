@@ -11,7 +11,7 @@ import { Box, Typography, Alert, Button, TextField } from '@mui/material';
 import 'rsuite/dist/rsuite.min.css';
 import '../styles/formengine-custom.css';
 
-const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialData = {}, data = {}, onChange }) => {
+const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialData = {}, data = {}, onChange, readOnly = false }) => {
   
   const [formData, setFormData] = useState(() => {
     // Prioriza data, depois initialData, depois objeto vazio
@@ -86,11 +86,12 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
               variant="outlined"
               placeholder={placeholder}
               value={formData[key] || ''}
-              onChange={(e) => handleInputChange(key, e.target.value)}
+              onChange={readOnly ? undefined : (e) => handleInputChange(key, e.target.value)}
               required={extractValue(props.required) || false}
               type={extractValue(props.inputType) || 'text'}
               multiline={isTextarea}
               rows={isTextarea ? rows : undefined}
+              disabled={readOnly}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -115,10 +116,11 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
               variant="outlined"
               placeholder={extractValue(props.placeholder) || `Digite aqui...`}
               value={formData[key] || ''}
-              onChange={(e) => handleInputChange(key, e.target.value)}
+              onChange={readOnly ? undefined : (e) => handleInputChange(key, e.target.value)}
               required={extractValue(props.required) || false}
               multiline
               rows={parseInt(extractValue(props.rows)) || 4}
+              disabled={readOnly}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -145,8 +147,9 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
               select
               variant="outlined"
               value={formData[key] || ''}
-              onChange={(e) => handleInputChange(key, e.target.value)}
+              onChange={readOnly ? undefined : (e) => handleInputChange(key, e.target.value)}
               required={extractValue(props.required) || false}
+              disabled={readOnly}
               SelectProps={{
                 native: true,
               }}
@@ -179,7 +182,8 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
                 type="checkbox"
                 id={key}
                 checked={formData[key] || false}
-                onChange={(e) => handleInputChange(key, e.target.checked)}
+                onChange={readOnly ? undefined : (e) => handleInputChange(key, e.target.checked)}
+                disabled={readOnly}
                 style={{ marginRight: 8 }}
               />
               <Typography variant="body2" component="label" htmlFor={key}>
@@ -213,7 +217,8 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
                       name={key}
                       value={optionValue}
                       checked={formData[key] === optionValue}
-                      onChange={(e) => handleInputChange(key, e.target.value)}
+                      onChange={readOnly ? undefined : (e) => handleInputChange(key, e.target.value)}
+                      disabled={readOnly}
                       style={{ marginRight: 8 }}
                     />
                     <Typography variant="body2" component="label" htmlFor={`${key}_${index}`}>
@@ -241,8 +246,9 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
               variant="outlined"
               type="date"
               value={formData[key] || ''}
-              onChange={(e) => handleInputChange(key, e.target.value)}
+              onChange={readOnly ? undefined : (e) => handleInputChange(key, e.target.value)}
               required={extractValue(props.required) || false}
+              disabled={readOnly}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -399,7 +405,7 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
           </Alert>
         )}
 
-        {onSubmit && (
+        {onSubmit && !readOnly && (
           <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
             <Button 
               variant="outlined" 
