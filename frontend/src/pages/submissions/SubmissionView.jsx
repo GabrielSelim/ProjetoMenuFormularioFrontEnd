@@ -450,17 +450,8 @@ const SubmissionView = () => {
               Voltar
             </Button>
             
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="h4" component="h1">
-                📋 {submission?.formName}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Submissão #{submission?.id}
-              </Typography>
-            </Box>
-            
             {/* Ações do Cabeçalho */}
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
               {availableActions.includes('editar') && (
                 <Button
                   variant="outlined"
