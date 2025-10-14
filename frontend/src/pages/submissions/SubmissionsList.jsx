@@ -198,7 +198,6 @@ const SubmissionsList = () => {
       ]);
     } catch (error) {
       setError('Erro ao carregar dados iniciais');
-      console.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
     }
@@ -206,9 +205,7 @@ const SubmissionsList = () => {
 
   const loadForms = async () => {
     try {
-      console.log('Carregando formulários da API...');
       const formsData = await formService.getForms();
-      console.log('Formulários carregados:', formsData);
       
       // Garantir que seja array
       if (Array.isArray(formsData)) {
@@ -218,11 +215,9 @@ const SubmissionsList = () => {
       } else if (formsData && Array.isArray(formsData.data)) {
         setForms(formsData.data);
       } else {
-        console.warn('Resposta de formulários não é array:', formsData);
         setForms([]);
       }
     } catch (error) {
-      console.error('Erro ao carregar formulários:', error);
       setForms([]);
     }
   };
@@ -238,14 +233,10 @@ const SubmissionsList = () => {
         tamanhoPagina: pagination.tamanhoPagina,
         ...filters
       };
-
-      console.log('Chamando API com parâmetros:', params);
       
       // Chamar API real - SEM FALLBACK MOCKADO
       const response = await submissionService.getAll(params);
-      
-      console.log('Resposta da API:', response);
-      
+            
       // Garantir que sempre seja um array
       let submissionsData = [];
       
@@ -260,11 +251,9 @@ const SubmissionsList = () => {
       } else if (response && Array.isArray(response.result)) {
         submissionsData = response.result;
       } else {
-        console.warn('Resposta da API não é um array:', response);
         submissionsData = [];
       }
       
-      console.log('Submissions processadas:', submissionsData);
       setSubmissions(submissionsData);
       
       // Atualizar informações de paginação se retornadas pela API
@@ -290,7 +279,6 @@ const SubmissionsList = () => {
       }
 
     } catch (error) {
-      console.error('Erro ao carregar submissões:', error);
       setError(`Erro ao conectar com a API: ${error.message}`);
       setSubmissions([]);
       
@@ -438,7 +426,6 @@ const SubmissionsList = () => {
 
     } catch (error) {
       setError(error.message || 'Erro ao executar ação');
-      console.error('Erro na ação:', error);
     }
   };
 

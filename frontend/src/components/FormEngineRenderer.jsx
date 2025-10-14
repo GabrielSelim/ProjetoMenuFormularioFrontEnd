@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { FormViewer, createView, BiDi } from '@react-form-builder/core';
 import { 
   rSuiteComponents,
@@ -12,11 +12,18 @@ import 'rsuite/dist/rsuite.min.css';
 import '../styles/formengine-custom.css';
 import '../mobx-config';
 
-const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
-  console.log('FormEngineRenderer - iniciando componente');
-  console.log('FormEngineRenderer - formSchema recebido:', formSchema);
+const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialData = {}, data = {}, onChange }) => {
   
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState(() => {
+    // Prioriza data, depois initialData, depois objeto vazio
+    return { ...initialData, ...data };
+  });
+
+  // Atualiza os dados quando as props mudarem
+  useEffect(() => {
+    const newData = { ...initialData, ...data };
+    setFormData(newData);
+  }, [initialData, data]);
 
   // Verifica se é um schema do FormEngine.io (mais flexível)
   const isFormEngineSchema = formSchema && 
@@ -28,18 +35,15 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
       formSchema.formEngineSchema.type
     );
 
-  console.log('FormEngineRenderer - isFormEngineSchema:', isFormEngineSchema);
 
   // Temporariamente desabilitando FormEngine para debug
   // Se não for schema do FormEngine, retorna null para usar o renderer padrão
   if (!isFormEngineSchema) {
-    console.log('FormEngineRenderer - não é schema do FormEngine, retornando null');
     return null;
   }
 
   // Criar um renderer personalizado baseado no schema do FormEngine
   const handleFormSubmit = () => {
-    console.log('Enviando dados do formulário:', formData);
     if (onSubmit) {
       onSubmit(formData);
     }
@@ -54,17 +58,21 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
   };
 
   const handleInputChange = (key, value) => {
-    console.log(`Campo ${key} alterado para:`, value);
-    setFormData(prevData => ({
-      ...prevData,
+    const newData = {
+      ...formData,
       [key]: value
-    }));
+    };
+    setFormData(newData);
+    
+    // Chama onChange se fornecido (para o auto-save)
+    if (onChange) {
+      onChange(newData);
+    }
   };
 
   const renderFormComponent = (component) => {
     const { key, type, props = {} } = component;
     
-    console.log(`Renderizando componente ${type} com key ${key}:`, props);
     
     switch (type) {
       case 'RsInput':
@@ -261,7 +269,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
               color={extractValue(props.color) || 'primary'}
               size={extractValue(props.size) || 'medium'}
               onClick={() => {
-                console.log(`Botão ${key} clicado`);
                 const onClick = extractValue(props.onClick);
                 if (onClick) onClick();
               }}
@@ -377,10 +384,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
         </Typography>
       )}
 
-      <Alert severity="success" sx={{ mb: 3 }}>
-        Formulário FormEngine carregado com sucesso! ({componentCount} componentes encontrados)
-      </Alert>
-
       <Box component="form" sx={{ 
         maxWidth: 600,
         mx: 'auto',
@@ -425,133 +428,8 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description }) => {
           </Box>
         )}
       </Box>
-
-      {/* Debug info - remover em produção */}
-      <Box sx={{ mt: 4, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-        <Typography variant="h6" gutterBottom>Estado do Formulário:</Typography>
-        <pre style={{ 
-          fontSize: '12px', 
-          background: '#fff', 
-          padding: '8px', 
-          borderRadius: '4px',
-          border: '1px solid #ddd'
-        }}>
-          {JSON.stringify(formData, null, 2)}
-        </pre>
-      </Box>
     </Box>
   );
-
-  /*
-  // Código FormEngine temporariamente comentado para debug
-  const handleFormSubmit = () => {
-    if (onSubmit) {
-      onSubmit(formData);
-    }
-  };
-
-  // Função para obter o form com a estrutura completa necessária
-  const getFormFn = useCallback(async (name) => {
-    try {
-      console.log('FormEngineRenderer - getFormFn chamado com name:', name);
-      console.log('FormEngineRenderer - formSchema:', formSchema);
-      
-      const formEngineData = formSchema.formEngineSchema;
-      console.log('FormEngineRenderer - formEngineData:', formEngineData);
-      
-      let formData;
-      if (typeof formEngineData === 'string') {
-        formData = JSON.parse(formEngineData);
-      } else {
-        formData = formEngineData;
-      }
-      
-      console.log('FormEngineRenderer - formData processado:', formData);
-      
-      // Garantir que o form tenha a estrutura correta
-      const formStructure = formData.form || formData;
-      
-      // Garantir que children seja sempre um array válido
-      if (!formStructure.children || !Array.isArray(formStructure.children)) {
-        console.warn('FormEngineRenderer - children não é array válido, criando array vazio');
-        formStructure.children = [];
-      }
-      
-      // Garantir que cada child tenha a estrutura necessária
-      formStructure.children = formStructure.children.map((child, index) => {
-        if (!child || typeof child !== 'object') {
-          console.warn(`FormEngineRenderer - child ${index} inválido, criando estrutura padrão`);
-          return {
-            key: `input_${index}`,
-            type: 'RsInput',
-            props: {}
-          };
-        }
-        
-        // Garantir propriedades obrigatórias
-        return {
-          key: child.key || `input_${index}`,
-          type: child.type || 'RsInput',
-          props: child.props || {}
-        };
-      });
-      
-      // Criar estrutura completa se necessário
-      const fullForm = {
-        "version": "1",
-        "tooltipType": "RsTooltip",
-        "errorType": "RsErrorMessage",
-        "form": formStructure,
-        "localization": formData.localization || {},
-        "languages": formData.languages || [{
-          "code": "pt",
-          "dialect": "BR",
-          "name": "Português",
-          "description": "Português do Brasil",
-          "bidi": "ltr"
-        }],
-        "defaultLanguage": formData.defaultLanguage || "pt-BR"
-      };
-      
-      console.log('FormEngineRenderer - fullForm final:', fullForm);
-      
-      const result = JSON.stringify(fullForm);
-      console.log('FormEngineRenderer - resultado JSON:', result);
-      
-      return result;
-    } catch (error) {
-      console.error('Erro ao processar schema do FormEngine:', error);
-      throw new Error('Erro ao processar schema do formulário');
-    }
-  }, [formSchema]);
-
-  // Criar a view do FormEngine
-  let view;
-  try {
-    console.log('FormEngineRenderer - rSuiteComponents:', rSuiteComponents);
-    console.log('FormEngineRenderer - tipo de rSuiteComponents:', typeof rSuiteComponents);
-    console.log('FormEngineRenderer - é array:', Array.isArray(rSuiteComponents));
-    
-    // Garantir que components seja um array
-    const components = Array.isArray(rSuiteComponents) ? rSuiteComponents : [];
-    
-    view = createView({
-      components: components,
-      localizationWrapper: RsLocalizationWrapper,
-      cssLoader: {
-        ltr: ltrCssLoader,
-        rtl: rtlCssLoader,
-        formEngine: formEngineRsuiteCssLoader
-      },
-      bidi: BiDi.LTR
-    });
-    
-    console.log('FormEngineRenderer - view criado com sucesso:', view);
-  } catch (error) {
-    console.error('Erro ao criar view do FormEngine:', error);
-    throw error;
-  }
-  */
 };
 
 export default FormEngineRenderer;

@@ -12,12 +12,13 @@ import {
   DialogContent,
   DialogActions,
   Snackbar,
-  Chip
+  Chip,
+  TextField
 } from '@mui/material';
 import {
   Save,
   ArrowBack,
-  SaveAlt,
+  Warning,
   Send
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -264,50 +265,90 @@ const SubmissionEdit = () => {
     if (!formSchema) {
       // Fallback para renderer simples se não tiver schema do FormEngine
       return (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Modo de Edição Simples
-          </Typography>
-          <Typography>
-            Schema do FormEngine.io não encontrado. Usando editor básico de dados.
-          </Typography>
-          
-          {/* Editor simples dos dados JSON */}
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Dados atuais:
+        <Box>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Modo de Edição Simples
             </Typography>
-            <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-              <pre style={{ margin: 0, fontSize: '12px', whiteSpace: 'pre-wrap' }}>
-                {JSON.stringify(formData, null, 2)}
-              </pre>
-            </Paper>
+            <Typography>
+              Schema do FormEngine.io não encontrado. Editando campos individualmente.
+            </Typography>
+          </Alert>
+          
+          {/* Editor simples por campos */}
+          <Box sx={{ mt: 3 }}>
+            {Object.keys(formData).length > 0 ? (
+              Object.entries(formData).map(([key, value]) => (
+                <Box key={key} sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
+                    {key}:
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    value={typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                    onChange={(e) => {
+                      let newValue = e.target.value;
+                      try {
+                        // Tenta fazer parse se parece com JSON
+                        if (newValue.startsWith('{') || newValue.startsWith('[')) {
+                          newValue = JSON.parse(newValue);
+                        }
+                      } catch (error) {
+                        // Mantém como string se não conseguir fazer parse
+                      }
+                      handleFormDataChange({
+                        ...formData,
+                        [key]: newValue
+                      });
+                    }}
+                    variant="outlined"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                      }
+                    }}
+                  />
+                </Box>
+              ))
+            ) : (
+              <Alert severity="warning">
+                Nenhum dado encontrado para editar.
+              </Alert>
+            )}
           </Box>
-        </Alert>
+        </Box>
       );
     }
 
     // Tentar usar FormEngine.io primeiro
     if (formSchema.formEngineSchema) {
       return (
-        <FormEngineRenderer
-          formSchema={formSchema}
-          data={formData}
-          onChange={handleFormDataChange}
-          readOnly={false}
-        />
+        <Box sx={{ mt: 2 }}>
+          <FormEngineRenderer
+            formSchema={formSchema}
+            initialData={formData}
+            data={formData}
+            onChange={handleFormDataChange}
+            readOnly={false}
+            title="Editar Formulário"
+          />
+        </Box>
       );
     }
 
     // Fallback para renderer padrão
     if (formSchema.fields) {
       return (
-        <FormRenderer
-          schema={formSchema}
-          initialData={formData}
-          onSubmit={handleFormDataChange}
-          readOnly={false}
-        />
+        <Box sx={{ mt: 2 }}>
+          <FormRenderer
+            schema={formSchema}
+            initialData={formData}
+            onSubmit={handleFormDataChange}
+            readOnly={false}
+          />
+        </Box>
       );
     }
 
@@ -322,12 +363,17 @@ const SubmissionEdit = () => {
     return (
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         <Sidebar />
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <Header />
-          <Container maxWidth="xl" sx={{ py: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-              <CircularProgress size={60} />
-            </Box>
+          <Container maxWidth="xl" sx={{ py: 3, flexGrow: 1, mt: 8 }}>
+            <Paper sx={{ p: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+              <Box textAlign="center">
+                <CircularProgress size={60} sx={{ mb: 2 }} />
+                <Typography variant="h6" color="text.secondary">
+                  Carregando submissão...
+                </Typography>
+              </Box>
+            </Paper>
           </Container>
         </Box>
       </Box>
@@ -338,19 +384,21 @@ const SubmissionEdit = () => {
     return (
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         <Sidebar />
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <Header />
-          <Container maxWidth="xl" sx={{ py: 3 }}>
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-            <Button
-              variant="contained"
-              startIcon={<ArrowBack />}
-              onClick={() => navigate('/submissions')}
-            >
-              Voltar para Lista
-            </Button>
+          <Container maxWidth="xl" sx={{ py: 3, flexGrow: 1, mt: 8 }}>
+            <Paper sx={{ p: 3 }}>
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {error}
+              </Alert>
+              <Button
+                variant="contained"
+                startIcon={<ArrowBack />}
+                onClick={() => navigate('/submissions')}
+              >
+                Voltar para Lista
+              </Button>
+            </Paper>
           </Container>
         </Box>
       </Box>
@@ -360,79 +408,84 @@ const SubmissionEdit = () => {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Header />
-        <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Container maxWidth="xl" sx={{ py: 3, flexGrow: 1, mt: 8 }}>
           {/* Cabeçalho */}
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-            <Button
-              startIcon={<ArrowBack />}
-              onClick={handleBack}
-              sx={{ mr: 2 }}
-            >
-              Voltar
-            </Button>
-            
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="h4" component="h1">
-                ✏️ Editando: {submission?.formName}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Submissão #{submission?.id} • Versão {submission?.versao}
-              </Typography>
-            </Box>
-            
-            {/* Indicadores de Status */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 2 }}>
-              {hasChanges && (
-                <Chip
-                  icon={<SaveAlt />}
-                  label="Alterações não salvas"
-                  color="warning"
-                  size="small"
-                />
-              )}
-              
-              {lastSaved && (
-                <Chip
-                  label={`Salvo às ${lastSaved.toLocaleTimeString('pt-BR')}`}
-                  color="success"
-                  size="small"
-                  variant="outlined"
-                />
-              )}
-              
-              {saving && (
-                <Chip
-                  icon={<CircularProgress size={16} />}
-                  label="Salvando..."
-                  color="primary"
-                  size="small"
-                />
-              )}
-            </Box>
-            
-            {/* Botões de Ação */}
-            <Box sx={{ display: 'flex', gap: 1 }}>
+          <Paper sx={{ p: 2, mb: 3, position: 'sticky', top: 80, zIndex: 1000, bgcolor: 'background.paper', boxShadow: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <Button
+                startIcon={<ArrowBack />}
+                onClick={handleBack}
                 variant="outlined"
-                startIcon={<Save />}
-                onClick={handleSaveOnly}
-                disabled={saving || !hasChanges}
+                size="small"
               >
-                Salvar
+                Voltar
               </Button>
               
-              <Button
-                variant="contained"
-                startIcon={<Send />}
-                onClick={handleSaveAndSubmit}
-                disabled={saving}
-              >
-                Salvar e Enviar
-              </Button>
+              <Box sx={{ flexGrow: 1, minWidth: '300px' }}>
+                <Typography variant="h5" component="h1" sx={{ mb: 0.5 }}>
+                  ✏️ {submission?.formName}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Submissão #{submission?.id} • Versão {submission?.versao}
+                </Typography>
+              </Box>
+              
+              {/* Indicadores de Status */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                {hasChanges && (
+                  <Chip
+                    icon={<Warning />}
+                    label="Não salvo"
+                    color="warning"
+                    size="small"
+                  />
+                )}
+                
+                {lastSaved && (
+                  <Chip
+                    label={`${lastSaved.toLocaleTimeString('pt-BR')}`}
+                    color="success"
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+                
+                {saving && (
+                  <Chip
+                    icon={<CircularProgress size={16} />}
+                    label="Salvando..."
+                    color="primary"
+                    size="small"
+                  />
+                )}
+              </Box>
+              
+              {/* Botões de Ação */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<Save />}
+                  onClick={handleSaveOnly}
+                  disabled={saving || !hasChanges}
+                  size="small"
+                >
+                  Salvar
+                </Button>
+                
+                <Button
+                  variant="contained"
+                  startIcon={<Send />}
+                  onClick={handleSaveAndSubmit}
+                  disabled={saving}
+                  size="small"
+                >
+                  Salvar e Enviar
+                </Button>
+              </Box>
             </Box>
-          </Box>
+          </Paper>
 
           {/* Status da Submissão */}
           <Alert 
@@ -458,12 +511,14 @@ const SubmissionEdit = () => {
           )}
 
           {/* Formulário */}
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: 3, minHeight: '400px' }}>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               📝 Dados do Formulário
             </Typography>
             
-            {renderForm()}
+            <Box sx={{ mt: 3 }}>
+              {renderForm()}
+            </Box>
           </Paper>
         </Container>
       </Box>
