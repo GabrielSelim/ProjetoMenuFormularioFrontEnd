@@ -158,32 +158,28 @@ const SubmissionView = () => {
       }
 
       let response;
-      const actionData = requiresInput ? { 
-        motivo: inputValue.trim(),
-        observacoes: inputValue.trim()
-      } : {};
 
       switch (type) {
         case 'enviar':
-          response = await submissionService.enviar(id, actionData);
+          response = await submissionService.enviar(id, inputValue?.trim() || '');
           break;
         case 'aprovar':
-          response = await submissionService.aprovar(id, actionData);
+          response = await submissionService.aprovar(id, inputValue?.trim() || '');
           break;
         case 'rejeitar':
-          response = await submissionService.rejeitar(id, { motivo: inputValue.trim() });
+          response = await submissionService.rejeitar(id, { 
+            motivoRejeicao: inputValue.trim(),
+            comentario: inputValue.trim()
+          });
           break;
         case 'cancelar':
-          response = await submissionService.cancelar(id, { motivo: inputValue.trim() });
-          break;
-        case 'colocarAnalise':
-          response = await submissionService.colocarAnalise(id, actionData);
+          response = await submissionService.cancelar(id, inputValue?.trim() || '');
           break;
         default:
           throw new Error('Ação não reconhecida');
       }
 
-      setSuccess(response.mensagem || 'Ação executada com sucesso!');
+      setSuccess(response.mensagem || response.message || 'Ação executada com sucesso!');
       setActionDialog({
         open: false,
         type: '',
@@ -194,12 +190,14 @@ const SubmissionView = () => {
         inputValue: ''
       });
 
-      // Recarregar submissão
       await loadSubmission();
 
     } catch (error) {
-      setError(error.message || 'Erro ao executar ação');
-      console.error('Erro na ação:', error);
+      const errorMessage = error.message || 
+                          error.title || 
+                          error.errors?.$?.[0] || 
+                          'Erro ao executar ação';
+      setError(errorMessage);
     }
   };
 
@@ -444,6 +442,7 @@ const SubmissionView = () => {
           {/* Cabeçalho */}
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <Button
+              variant="outlined"
               startIcon={<ArrowBack />}
               onClick={() => navigate('/submissions')}
               sx={{ mr: 2 }}

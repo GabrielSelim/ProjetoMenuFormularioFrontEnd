@@ -48,10 +48,13 @@ export const submissionService = {
   },
 
   // Excluir submissão (soft delete)
-  delete: async (id, motivo) => {
+  delete: async (id, motivo = '') => {
     try {
       const response = await api.delete(`/SubmissoesFormulario/${id}`, {
-        data: { motivo }
+        data: motivo,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       return response.data;
     } catch (error) {
@@ -63,31 +66,62 @@ export const submissionService = {
   // ============= WORKFLOW ACTIONS =============
 
   // Enviar submissão para análise
-  enviar: async (id, data = {}) => {
+  enviar: async (id, comentario = '') => {
     try {
-      const response = await api.post(`/SubmissoesFormulario/${id}/enviar`, data);
+      const response = await api.post(`/SubmissoesFormulario/${id}/enviar`, comentario, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       return response.data;
     } catch (error) {
-      console.error('Erro ao enviar submissão:', error);
-      throw error.response?.data || { message: 'Erro ao enviar submissão' };
+      if (error.response?.data) {
+        const apiError = error.response.data;
+        if (apiError.errors && apiError.errors.$) {
+          throw new Error(apiError.errors.$[0]);
+        }
+        if (apiError.title) {
+          throw new Error(apiError.title);
+        }
+        if (apiError.message) {
+          throw new Error(apiError.message);
+        }
+      }
+      throw new Error('Erro ao enviar submissão');
     }
   },
 
-  // Colocar submissão em análise (Admin/Gestor)
-  colocarAnalise: async (id, data = {}) => {
+  // Mudar status da submissão (função genérica)
+  mudarStatus: async (id, { novoStatus, comentario = '', motivoRejeicao = null, versao }) => {
     try {
-      const response = await api.post(`/SubmissoesFormulario/${id}/colocar-analise`, data);
+      const payload = {
+        novoStatus,
+        comentario,
+        versao
+      };
+      
+      if (motivoRejeicao) {
+        payload.motivoRejeicao = motivoRejeicao;
+      }
+      
+      const response = await api.put(`/SubmissoesFormulario/${id}/status`, payload);
       return response.data;
     } catch (error) {
-      console.error('Erro ao colocar em análise:', error);
-      throw error.response?.data || { message: 'Erro ao colocar em análise' };
+      console.error('Erro ao mudar status:', error);
+      throw error.response?.data || { message: 'Erro ao mudar status' };
     }
   },
+
+
 
   // Aprovar submissão (Admin/Gestor)
-  aprovar: async (id, data = {}) => {
+  aprovar: async (id, comentario = '') => {
     try {
-      const response = await api.post(`/SubmissoesFormulario/${id}/aprovar`, data);
+      const response = await api.post(`/SubmissoesFormulario/${id}/aprovar`, comentario, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Erro ao aprovar submissão:', error);
@@ -96,12 +130,16 @@ export const submissionService = {
   },
 
   // Rejeitar submissão (Admin/Gestor)
-  rejeitar: async (id, data) => {
+  rejeitar: async (id, { comentario = '', motivoRejeicao }) => {
     try {
-      if (!data.motivo) {
+      if (!motivoRejeicao) {
         throw new Error('Motivo da rejeição é obrigatório');
       }
-      const response = await api.post(`/SubmissoesFormulario/${id}/rejeitar`, data);
+      const payload = {
+        comentario,
+        motivoRejeicao
+      };
+      const response = await api.post(`/SubmissoesFormulario/${id}/rejeitar`, payload);
       return response.data;
     } catch (error) {
       console.error('Erro ao rejeitar submissão:', error);
@@ -110,12 +148,13 @@ export const submissionService = {
   },
 
   // Cancelar submissão
-  cancelar: async (id, data) => {
+  cancelar: async (id, comentario = '') => {
     try {
-      if (!data.motivo) {
-        throw new Error('Motivo do cancelamento é obrigatório');
-      }
-      const response = await api.post(`/SubmissoesFormulario/${id}/cancelar`, data);
+      const response = await api.post(`/SubmissoesFormulario/${id}/cancelar`, comentario, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Erro ao cancelar submissão:', error);
@@ -256,7 +295,7 @@ export const getAvailableActions = (submission, userRole) => {
       
     case StatusSubmissao.Enviado:
       if (userRole === 'admin' || userRole === 'gestor') {
-        actions.push('colocarAnalise');
+        actions.push('aprovar', 'rejeitar');
       }
       actions.push('cancelar');
       break;

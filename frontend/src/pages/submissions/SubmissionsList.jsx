@@ -387,11 +387,6 @@ const SubmissionsList = () => {
         message: `Deseja cancelar a submissão "${submission?.formName}"?`,
         requiresInput: true,
         inputLabel: 'Motivo do cancelamento (obrigatório)'
-      },
-      colocarAnalise: {
-        title: 'Colocar em Análise',
-        message: `Deseja colocar a submissão "${submission?.formName}" em análise?`,
-        requiresInput: false
       }
     };
 
@@ -430,19 +425,19 @@ const SubmissionsList = () => {
           response = await submissionService.delete(submissionId, inputValue.trim());
           break;
         case 'enviar':
-          response = await submissionService.enviar(submissionId, actionData);
+          response = await submissionService.enviar(submissionId, inputValue?.trim() || '');
           break;
         case 'aprovar':
-          response = await submissionService.aprovar(submissionId, actionData);
+          response = await submissionService.aprovar(submissionId, inputValue?.trim() || '');
           break;
         case 'rejeitar':
-          response = await submissionService.rejeitar(submissionId, { motivo: inputValue.trim() });
+          response = await submissionService.rejeitar(submissionId, { 
+            motivoRejeicao: inputValue.trim(),
+            comentario: inputValue.trim()
+          });
           break;
         case 'cancelar':
-          response = await submissionService.cancelar(submissionId, { motivo: inputValue.trim() });
-          break;
-        case 'colocarAnalise':
-          response = await submissionService.colocarAnalise(submissionId, actionData);
+          response = await submissionService.cancelar(submissionId, inputValue?.trim() || '');
           break;
         default:
           throw new Error('Ação não reconhecida');

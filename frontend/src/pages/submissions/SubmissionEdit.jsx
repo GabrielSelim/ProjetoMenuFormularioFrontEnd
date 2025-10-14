@@ -194,9 +194,7 @@ const SubmissionEdit = () => {
       await submissionService.update(id, updateData);
 
       // Depois enviar para análise
-      await submissionService.enviar(id, {
-        observacoes: 'Submissão atualizada e enviada'
-      });
+      await submissionService.enviar(id, 'Submissão atualizada e enviada');
 
       setSuccess('Submissão salva e enviada com sucesso!');
       
