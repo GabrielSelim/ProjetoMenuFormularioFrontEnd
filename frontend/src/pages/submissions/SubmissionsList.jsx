@@ -21,7 +21,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Snackbar
+  Snackbar,
+  Autocomplete
 } from '@mui/material';
 import {
   Add,
@@ -31,7 +32,10 @@ import {
   MoreVert,
   Send,
   CheckCircle,
-  Cancel
+  Cancel,
+  FilterList,
+  ExpandMore,
+  ExpandLess
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -67,9 +71,7 @@ const SubmissionCard = ({ submission, onView, onEdit, onDelete }) => {
           📋 {submission.formName || submission.nomeFormulario || `Formulário ${submission.formId}`}
         </Typography>
         
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          <strong>ID:</strong> {submission.id}
-        </Typography>
+
         
         {submission.userName && (
           <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -141,18 +143,24 @@ const SubmissionsList = () => {
   // Estados de filtros e paginação
   const [filters, setFilters] = useState({
     formId: '',
+    userId: '',
     status: '',
-    search: '',
-    dataInicio: '',
-    dataFim: '',
-    usuarioId: ''
+    dataInicialCriacao: '',
+    dataFinalCriacao: '',
+    dataInicialSubmissao: '',
+    dataFinalSubmissao: '',
+    usuarioAprovadorId: '',
+    incluirExcluidas: false
   });
   const [pagination, setPagination] = useState({
-    paginaAtual: 1,
+    pagina: 1,
     totalPaginas: 1,
     totalItens: 0,
     tamanhoPagina: 12
   });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [selectedForm, setSelectedForm] = useState(null);
 
   // Estados de modais e ações
   const [actionDialog, setActionDialog] = useState({
@@ -175,6 +183,13 @@ const SubmissionsList = () => {
         formId: location.state.filterByForm
       }));
       
+      // Encontrar e definir o formulário selecionado
+      const formId = location.state.filterByForm;
+      const form = forms.find(f => f.id == formId);
+      if (form) {
+        setSelectedForm(form);
+      }
+      
       // Mostrar mensagem de sucesso se fornecida
       if (location.state.message) {
         setSuccess(location.state.message);
@@ -187,7 +202,7 @@ const SubmissionsList = () => {
   // Recarregar quando filtros ou página mudam
   useEffect(() => {
     loadSubmissions();
-  }, [filters, pagination.paginaAtual]);
+  }, [filters, pagination.pagina]);
 
   const loadInitialData = async () => {
     try {
@@ -229,10 +244,18 @@ const SubmissionsList = () => {
 
       // Preparar parâmetros para a API
       const params = {
-        pagina: pagination.paginaAtual,
+        pagina: pagination.pagina,
         tamanhoPagina: pagination.tamanhoPagina,
-        ...filters
+        campoOrdenacao: 'dataAtualizacao',
+        direcaoOrdenacao: 'desc'
       };
+
+      // Adicionar filtros apenas se preenchidos
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+          params[key] = value;
+        }
+      });
       
       // Chamar API real - SEM FALLBACK MOCKADO
       const response = await submissionService.getAll(params);
@@ -295,11 +318,27 @@ const SubmissionsList = () => {
 
   const handleFiltersChange = (newFilters) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, paginaAtual: 1 }));
+    setPagination(prev => ({ ...prev, pagina: 1 }));
   };
 
   const handlePageChange = (event, newPage) => {
-    setPagination(prev => ({ ...prev, paginaAtual: newPage }));
+    setPagination(prev => ({ ...prev, pagina: newPage }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      formId: '',
+      userId: '',
+      status: '',
+      dataInicialCriacao: '',
+      dataFinalCriacao: '',
+      dataInicialSubmissao: '',
+      dataFinalSubmissao: '',
+      usuarioAprovadorId: '',
+      incluirExcluidas: false
+    });
+    setSelectedForm(null);
+    setPagination(prev => ({ ...prev, pagina: 1 }));
   };
 
   const handleView = (submissionId) => {
@@ -444,23 +483,30 @@ const SubmissionsList = () => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Sidebar />
+      </Box>
+      <Box component="main" sx={{ flexGrow: 1, width: { xs: '100%', md: 'auto' } }}>
         <Header />
-        <Container maxWidth="xl" sx={{ py: 3, mt: '80px' }}> {/* Adicionar margem superior */}
-          {/* Cabeçalho */}
+        <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 }, mt: { xs: '70px', md: '80px' }, px: { xs: 2, md: 3 } }}>
           <Box sx={{ 
             display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between', 
-            alignItems: 'flex-start', // Mudar para flex-start
+            alignItems: { xs: 'stretch', sm: 'flex-start' },
             mb: 3,
-            gap: 2 // Adicionar gap
+            gap: 2
           }}>
             <Box sx={{ flex: 1 }}>
-              <Typography variant="h4" component="h1" gutterBottom>
+              <Typography 
+                variant="h4" 
+                component="h1" 
+                gutterBottom
+                sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}
+              >
                 📋 Minhas Submissões
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body2" color="text.secondary">
                 {pagination.totalItens} submissão(ões) encontrada(s)
               </Typography>
             </Box>
@@ -470,7 +516,8 @@ const SubmissionsList = () => {
               onClick={() => navigate('/forms')}
               size="large"
               sx={{ 
-                minWidth: '180px',
+                width: { xs: '100%', sm: 'auto' },
+                minWidth: { sm: '180px' },
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}
@@ -486,34 +533,137 @@ const SubmissionsList = () => {
             </Alert>
           )}
 
-          {/* Filtros Simples */}
-          <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                label="Buscar"
-                size="small"
-                value={filters.search}
-                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                sx={{ flex: 1 }}
-              />
-              <Button 
-                variant="outlined" 
-                onClick={() => {
-                  setFilters({
-                    formId: '',
-                    status: '',
-                    search: '',
-                    dataInicio: '',
-                    dataFim: '',
-                    usuarioId: ''
-                  });
-                  loadSubmissions();
-                }}
-              >
-                Limpar Filtros
-              </Button>
-            </Stack>
-          </Box>
+          <Card sx={{ mb: 3, position: 'relative', zIndex: 1 }}>
+            <CardContent sx={{ pb: 2 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                mb: { xs: 2, md: 3 }
+              }}>
+                <Typography variant="h6">
+                  Filtros
+                </Typography>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<FilterList />}
+                  endIcon={showMobileFilters ? <ExpandLess /> : <ExpandMore />}
+                  onClick={() => setShowMobileFilters(!showMobileFilters)}
+                  sx={{ 
+                    display: { xs: 'flex', md: 'none' },
+                    minWidth: 'auto'
+                  }}
+                >
+                  {showMobileFilters ? 'Ocultar' : 'Mostrar'}
+                </Button>
+              </Box>
+              
+              <Box sx={{
+                display: { xs: showMobileFilters ? 'block' : 'none', md: 'block' }
+              }}>
+                <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 3 }}>
+                  <Grid item xs={12} sm={12} md={5}>
+                    <Autocomplete
+                      options={forms}
+                      getOptionLabel={(option) => option.name || option.title || `Formulário ${option.id}`}
+                      value={selectedForm}
+                      onChange={(event, newValue) => {
+                        setSelectedForm(newValue);
+                        setFilters(prev => ({ ...prev, formId: newValue ? newValue.id : '' }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Formulário"
+                          size="small"
+                          placeholder="Digite para buscar..."
+                        />
+                      )}
+                      noOptionsText="Nenhum formulário encontrado"
+                      clearText="Limpar"
+                      openText="Abrir"
+                      closeText="Fechar"
+                      size="small"
+                      fullWidth
+                      ListboxProps={{
+                        style: {
+                          maxHeight: 200,
+                        },
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={12} md={2}>
+                    <TextField
+                      select
+                      label="Status"
+                      size="small"
+                      fullWidth
+                      value={filters.status}
+                      onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                      SelectProps={{ native: true }}
+                      InputLabelProps={{ shrink: true }}
+                    >
+                      <option value=""></option>
+                      <option value="0">Rascunho</option>
+                      <option value="1">Enviado</option>
+                      <option value="2">Em Análise</option>
+                      <option value="3">Aprovado</option>
+                      <option value="4">Rejeitado</option>
+                      <option value="5">Cancelado</option>
+                    </TextField>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <TextField
+                      label="Data Inicial"
+                      type="date"
+                      size="small"
+                      fullWidth
+                      value={filters.dataInicialCriacao}
+                      onChange={(e) => setFilters(prev => ({ ...prev, dataInicialCriacao: e.target.value }))}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <TextField
+                      label="Data Final"
+                      type="date"
+                      size="small"
+                      fullWidth
+                      value={filters.dataFinalCriacao}
+                      onChange={(e) => setFilters(prev => ({ ...prev, dataFinalCriacao: e.target.value }))}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  gap: 2, 
+                  alignItems: { xs: 'stretch', sm: 'center' }
+                }}>
+                  <Button 
+                    variant="outlined" 
+                    onClick={clearFilters}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  >
+                    Limpar Filtros
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    onClick={loadSubmissions}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  >
+                    Buscar
+                  </Button>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
 
           {/* Loading */}
           {loading && (
@@ -546,7 +696,7 @@ const SubmissionsList = () => {
                   </Button>
                 </Alert>
               ) : (
-                <Grid container spacing={3}>
+                <Grid container spacing={{ xs: 2, md: 3 }}>
                   {Array.isArray(submissions) && submissions.map((submission) => (
                     <Grid item xs={12} sm={6} md={4} key={submission.id}>
                       <SubmissionCard
@@ -560,18 +710,40 @@ const SubmissionsList = () => {
                 </Grid>
               )}
 
-              {/* Paginação */}
               {pagination.totalPaginas > 1 && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                  <Pagination
-                    count={pagination.totalPaginas}
-                    page={pagination.paginaAtual}
-                    onChange={handlePageChange}
-                    color="primary"
-                    size="large"
-                    showFirstButton
-                    showLastButton
-                  />
+                  <Stack spacing={2} alignItems="center">
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      textAlign="center"
+                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                    >
+                      Página {pagination.pagina} de {pagination.totalPaginas} • {pagination.totalItens} item(s)
+                    </Typography>
+                    <Pagination
+                      count={pagination.totalPaginas}
+                      page={pagination.pagina}
+                      onChange={handlePageChange}
+                      color="primary"
+                      size="large"
+                      showFirstButton
+                      showLastButton
+                      siblingCount={1}
+                      boundaryCount={1}
+                      sx={{
+                        '& .MuiPagination-ul': {
+                          flexWrap: 'wrap',
+                          justifyContent: 'center'
+                        },
+                        '& .MuiPaginationItem-root': {
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          minWidth: { xs: '28px', sm: '32px' },
+                          height: { xs: '28px', sm: '32px' }
+                        }
+                      }}
+                    />
+                  </Stack>
                 </Box>
               )}
             </>
