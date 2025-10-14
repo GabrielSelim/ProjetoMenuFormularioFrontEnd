@@ -213,6 +213,154 @@ const SubmissionView = () => {
     });
   };
 
+  const handlePrint = () => {
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    
+    // Criar conteúdo HTML para impressão
+    let formHtml = '';
+    
+    if (submission?.dataJson) {
+      try {
+        const formData = JSON.parse(submission.dataJson);
+        
+        Object.entries(formData).forEach(([key, value]) => {
+          if (value === null || value === undefined || value === '') return;
+          
+          let displayValue = value;
+          if (typeof value === 'object') {
+            displayValue = JSON.stringify(value, null, 2);
+          } else if (typeof value === 'boolean') {
+            displayValue = value ? 'Sim' : 'Não';
+          }
+          
+          formHtml += `
+            <div style="margin-bottom: 8px; page-break-inside: avoid;">
+              <div style="font-weight: bold; color: #000; margin-bottom: 3px; font-size: 12px;">${key}:</div>
+              <div style="padding: 5px; border: 1px solid #000; border-radius: 2px; min-height: 18px; word-wrap: break-word; background: white; font-size: 11px;">${displayValue}</div>
+            </div>
+          `;
+        });
+      } catch (error) {
+        formHtml = '<div>Erro ao processar dados do formulário.</div>';
+      }
+    } else {
+      formHtml = '<div>Nenhum dado encontrado.</div>';
+    }
+
+    const printWindow = window.open('', '_blank', 'width=794,height=1123');
+    
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>${submission?.formName || 'Formulário'}</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 15mm;
+            }
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 12px;
+              line-height: 1.3;
+              color: #000;
+              background: white;
+              height: 100vh;
+              overflow: hidden;
+              display: flex;
+              flex-direction: column;
+            }
+            .header {
+              display: flex;
+              align-items: center;
+              margin-bottom: 15px;
+              padding-bottom: 8px;
+              border-bottom: 2px solid #000;
+              flex-shrink: 0;
+            }
+            .logo {
+              width: 60px;
+              height: 60px;
+              margin-right: 15px;
+              flex-shrink: 0;
+            }
+            .title {
+              font-size: 20px;
+              font-weight: bold;
+              color: #000;
+            }
+            .content {
+              flex: 1;
+              overflow: hidden;
+            }
+            @media print {
+              body {
+                height: auto;
+                overflow: visible;
+              }
+              .content {
+                overflow: visible;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div style="width: 60px; height: 60px; background: #ddd; margin-right: 15px; flex-shrink: 0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #666;">LOGO</div>
+            <div class="title">${submission?.formName || 'Formulário'}</div>
+          </div>
+          <div class="content">
+            ${formHtml}
+          </div>
+        </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    
+    // Tentar carregar a logo
+    if (printWindow.document.querySelector('.header div[style*="background: #ddd"]')) {
+      const logoImg = new Image();
+      logoImg.src = '/LogoSemFundo.png';
+      logoImg.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 60;
+        canvas.height = 60;
+        ctx.drawImage(logoImg, 0, 0, 60, 60);
+        const logoDataUrl = canvas.toDataURL('image/png');
+        
+        const logoDiv = printWindow.document.querySelector('.header div[style*="background: #ddd"]');
+        logoDiv.innerHTML = `<img src="${logoDataUrl}" style="width: 60px; height: 60px;" alt="Logo" />`;
+        
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 500);
+      };
+      
+      logoImg.onerror = () => {
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 500);
+      };
+    } else {
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    }
+  };
+
   const renderFormData = () => {
     if (!submission?.dataJson) return null;
 
@@ -241,7 +389,13 @@ const SubmissionView = () => {
           </Box>
           
           {/* Renderização do Formulário */}
-          <Box sx={{ p: 3 }}>
+          <Box sx={{ 
+            p: 3,
+            display: 'flex',
+            justifyContent: { xs: 'center', sm: 'flex-start' },
+            alignItems: { xs: 'center', sm: 'flex-start' },
+            flexDirection: 'column'
+          }}>
             {Object.entries(formData).length === 0 ? (
               <Alert severity="info">
                 Nenhum dado foi preenchido neste formulário.
@@ -438,9 +592,24 @@ const SubmissionView = () => {
       <Sidebar />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Header />
-        <Container maxWidth="xl" sx={{ py: 3, mt: '80px' }}> {/* Adicionar margem superior */}
+        <Container maxWidth="xl" sx={{ 
+          py: 3, 
+          mt: '80px',
+          px: { xs: 2, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: { xs: 'center', sm: 'stretch' }
+        }}> {/* Adicionar margem superior e centralização mobile */}
           {/* Cabeçalho */}
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: 3,
+            width: '100%',
+            justifyContent: { xs: 'center', sm: 'flex-start' },
+            flexWrap: 'wrap',
+            gap: { xs: 1, sm: 0 }
+          }}>
             <Button
               variant="outlined"
               startIcon={<ArrowBack />}
@@ -451,7 +620,14 @@ const SubmissionView = () => {
             </Button>
             
             {/* Ações do Cabeçalho */}
-            <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1, 
+              ml: { xs: 0, sm: 'auto' },
+              justifyContent: { xs: 'center', sm: 'flex-end' },
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 2, sm: 0 }
+            }}>
               {availableActions.includes('editar') && (
                 <Button
                   variant="outlined"
@@ -465,7 +641,7 @@ const SubmissionView = () => {
               <Button
                 variant="outlined"
                 startIcon={<Print />}
-                onClick={() => window.print()}
+                onClick={handlePrint}
               >
                 Imprimir
               </Button>
@@ -480,9 +656,13 @@ const SubmissionView = () => {
           )}
 
           {/* Card de Status Compacto */}
-          <Card sx={{ mb: 4 }}>
+          <Card sx={{ 
+            mb: 4,
+            width: { xs: '100%', sm: 'auto' },
+            maxWidth: { xs: 'none', sm: 'none' }
+          }}>
             <CardContent sx={{ p: 3 }}>
-              <Grid container spacing={3} alignItems="center">
+              <Grid container spacing={3} alignItems="center" justifyContent={{ xs: 'center', sm: 'flex-start' }}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
@@ -588,8 +768,18 @@ const SubmissionView = () => {
           </Card>
 
           {/* Formulário Preenchido - Largura Total */}
-          <Box sx={{ mb: 3 }}>
-            {renderFormData()}
+          <Box sx={{ 
+            mb: 3,
+            display: 'flex',
+            justifyContent: { xs: 'center', sm: 'flex-start' },
+            width: '100%'
+          }}>
+            <Box sx={{ 
+              width: '100%',
+              maxWidth: { xs: '100%', sm: 'none' }
+            }}>
+              {renderFormData()}
+            </Box>
           </Box>
 
           {/* Informações Adicionais e Histórico */}

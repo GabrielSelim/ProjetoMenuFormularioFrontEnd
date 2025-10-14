@@ -41,8 +41,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { submissionService, StatusSubmissaoLabels, StatusSubmissaoColors } from '../../api/submissionService';
 import { formService } from '../../api/formService';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
+import Layout from '../../components/Layout';
 
 // Componente de Card simples
 const SubmissionCard = ({ submission, onView, onEdit, onDelete }) => {
@@ -477,13 +476,14 @@ const SubmissionsList = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-        <Sidebar />
-      </Box>
-      <Box component="main" sx={{ flexGrow: 1, width: { xs: '100%', md: 'auto' } }}>
-        <Header />
-        <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 }, mt: { xs: '70px', md: '80px' }, px: { xs: 2, md: 3 } }}>
+    <Layout>
+      <Container maxWidth="xl" sx={{ 
+        py: { xs: 2, md: 3 }, 
+        px: { xs: 2, md: 3 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: { xs: 'center', sm: 'stretch' }
+      }}>
           <Box sx={{ 
             display: 'flex', 
             flexDirection: { xs: 'column', sm: 'row' },
@@ -558,7 +558,10 @@ const SubmissionsList = () => {
                 display: { xs: showMobileFilters ? 'block' : 'none', md: 'block' },
                 overflow: 'visible'
               }}>
-                <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 3 }}>
+                <Grid container spacing={{ xs: 2, md: 3 }} sx={{ 
+                  mb: 3,
+                  justifyContent: { xs: 'center', sm: 'flex-start' }
+                }}>
                   <Grid item xs={12} sm={12} md={5} sx={{ position: 'relative' }}>
                     <Autocomplete
                       disablePortal
@@ -715,7 +718,9 @@ const SubmissionsList = () => {
                   </Button>
                 </Alert>
               ) : (
-                <Grid container spacing={{ xs: 2, md: 3 }}>
+                <Grid container spacing={{ xs: 2, md: 3 }} sx={{
+                  justifyContent: { xs: 'center', sm: 'flex-start' }
+                }}>
                   {Array.isArray(submissions) && submissions.map((submission) => (
                     <Grid item xs={12} sm={6} md={4} key={submission.id}>
                       <SubmissionCard
@@ -768,7 +773,6 @@ const SubmissionsList = () => {
             </>
           )}
         </Container>
-      </Box>
 
       {/* Dialog de Confirmação de Ações */}
       <Dialog
@@ -823,7 +827,7 @@ const SubmissionsList = () => {
           {success}
         </Alert>
       </Snackbar>
-    </Box>
+    </Layout>
   );
 };
 
