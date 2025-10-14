@@ -10,7 +10,6 @@ import {
 import { Box, Typography, Alert, Button, TextField } from '@mui/material';
 import 'rsuite/dist/rsuite.min.css';
 import '../styles/formengine-custom.css';
-import '../mobx-config';
 
 const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialData = {}, data = {}, onChange }) => {
   
@@ -18,12 +17,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
     // Prioriza data, depois initialData, depois objeto vazio
     return { ...initialData, ...data };
   });
-
-  // Atualiza os dados quando as props mudarem
-  useEffect(() => {
-    const newData = { ...initialData, ...data };
-    setFormData(newData);
-  }, [initialData, data]);
 
   // Verifica se é um schema do FormEngine.io (mais flexível)
   const isFormEngineSchema = formSchema && 
@@ -35,8 +28,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
       formSchema.formEngineSchema.type
     );
 
-
-  // Temporariamente desabilitando FormEngine para debug
   // Se não for schema do FormEngine, retorna null para usar o renderer padrão
   if (!isFormEngineSchema) {
     return null;

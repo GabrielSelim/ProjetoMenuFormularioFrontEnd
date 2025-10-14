@@ -27,18 +27,27 @@ const FormRenderer = ({ schema, onSubmit, initialData = {}, readOnly = false }) 
     defaultValues: initialData
   });
 
-  // Tenta usar o FormEngineRenderer primeiro
-  const formEngineComponent = FormEngineRenderer({ 
-    formSchema: schema, 
-    onSubmit, 
-    title: schema?.title, 
-    description: schema?.description,
-    initialData,
-    data: initialData
-  });
+  // Verifica se deve usar o FormEngineRenderer
+  const shouldUseFormEngine = schema && 
+    schema.formEngineSchema && (
+      schema.formEngineSchema.form ||
+      schema.formEngineSchema.components ||
+      schema.formEngineSchema.fields ||
+      Array.isArray(schema.formEngineSchema) ||
+      schema.formEngineSchema.type
+    );
   
-  if (formEngineComponent) {
-    return formEngineComponent;
+  if (shouldUseFormEngine) {
+    return (
+      <FormEngineRenderer
+        formSchema={schema}
+        onSubmit={onSubmit}
+        title={schema?.title}
+        description={schema?.description}
+        initialData={initialData}
+        data={initialData}
+      />
+    );
   }
 
   // Se não tem fields mas tem formEngineSchema, deixa o FormEngineRenderer lidar com isso
