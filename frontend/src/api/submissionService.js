@@ -9,7 +9,6 @@ export const submissionService = {
       const response = await api.post('/SubmissoesFormulario', data);
       return response.data;
     } catch (error) {
-      console.error('Erro ao criar submissão:', error);
       throw error.response?.data || { message: 'Erro ao criar submissão' };
     }
   },

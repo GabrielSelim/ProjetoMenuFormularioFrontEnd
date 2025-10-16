@@ -193,8 +193,8 @@ const FormBuilderAdvanced = () => {
       };
 
       if (isEditMode && id) {
-        await formService.updateForm(id, formPayload);
-        setSuccess('Formulário atualizado com sucesso!');
+        await formService.updateForm(id, { ...formPayload, createNewVersion: true });
+        setSuccess('Nova versão do formulário criada com sucesso!');
       } else {
         await formService.createForm(formPayload);
         setSuccess('Formulário criado com sucesso!');

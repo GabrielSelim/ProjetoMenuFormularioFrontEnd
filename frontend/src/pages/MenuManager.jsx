@@ -60,7 +60,10 @@ const MenuManager = () => {
     order: 0,
     isActive: true,
     isVisible: true,
-    description: ''
+    description: '',
+    originalFormId: null,
+    formVersion: '',
+    useLatestVersion: true
   });
   const [error, setError] = useState('');
 
@@ -181,7 +184,10 @@ const MenuManager = () => {
         order: menu.order || 0,
         isActive: menu.isActive !== false,
         isVisible: menu.isVisible !== false,
-        description: menu.description || ''
+        description: menu.description || '',
+        originalFormId: menu.originalFormId || null,
+        formVersion: menu.formVersion || '',
+        useLatestVersion: menu.useLatestVersion !== false
       });
     } else {
       setEditingMenu(null);
@@ -206,6 +212,21 @@ const MenuManager = () => {
     setDialogOpen(false);
     setEditingMenu(null);
     setError('');
+    setFormData({
+      name: '',
+      icon: '',
+      contentType: 'route',
+      urlOrPath: '',
+      rolesAllowed: '',
+      parentId: null,
+      order: 0,
+      isActive: true,
+      isVisible: true,
+      description: '',
+      originalFormId: null,
+      formVersion: '',
+      useLatestVersion: true
+    });
   };
 
   const handleSubmit = async () => {
@@ -661,32 +682,89 @@ const MenuManager = () => {
               
               {/* Campo dinâmico baseado no tipo de conteúdo */}
               {formData.contentType === 'form' ? (
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                  <InputLabel>Selecionar Formulário</InputLabel>
-                  <Select
-                    value={formData.urlOrPath}
-                    label="Selecionar Formulário"
-                    onChange={(e) => setFormData({ ...formData, urlOrPath: e.target.value })}
-                    disabled={loadingForms}
-                  >
-                    <MenuItem value="">
-                      <em>Selecione um formulário</em>
-                    </MenuItem>
-                    {availableForms.map(form => (
-                      <MenuItem key={form.id} value={form.id.toString()}>
-                        {form.name}
+                <>
+                  <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel>Selecionar Formulário</InputLabel>
+                    <Select
+                      value={formData.originalFormId?.toString() || ''}
+                      label="Selecionar Formulário"
+                      onChange={(e) => {
+                        const selectedForm = availableForms.find(f => (f.originalFormId || f.id).toString() === e.target.value);
+                        setFormData({ 
+                          ...formData, 
+                          originalFormId: parseInt(e.target.value),
+                          urlOrPath: selectedForm?.id.toString() || '',
+                          formVersion: selectedForm?.version || '1.0'
+                        });
+                      }}
+                      disabled={loadingForms}
+                    >
+                      <MenuItem value="">
+                        <em>Selecione um formulário</em>
                       </MenuItem>
-                    ))}
-                  </Select>
-                  {loadingForms && (
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                      Carregando formulários...
-                    </Typography>
+                      {availableForms
+                        .filter((form, index, self) => 
+                          index === self.findIndex(f => (f.originalFormId || f.id) === (form.originalFormId || form.id))
+                        )
+                        .map(form => (
+                          <MenuItem key={form.originalFormId || form.id} value={(form.originalFormId || form.id).toString()}>
+                            {form.name}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                    {loadingForms && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                        Carregando formulários...
+                      </Typography>
+                    )}
+                  </FormControl>
+
+                  {formData.originalFormId && (
+                    <>
+                      <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel>Versão</InputLabel>
+                        <Select
+                          value={formData.formVersion || ''}
+                          label="Versão"
+                          onChange={(e) => {
+                            const selectedVersionForm = availableForms.find(f => 
+                              (f.originalFormId || f.id) === formData.originalFormId && f.version === e.target.value
+                            );
+                            setFormData({ 
+                              ...formData, 
+                              formVersion: e.target.value,
+                              urlOrPath: selectedVersionForm?.id.toString() || ''
+                            });
+                          }}
+                        >
+                          {availableForms
+                            .filter(f => (f.originalFormId || f.id) === formData.originalFormId)
+                            .sort((a, b) => parseFloat(b.version || '1.0') - parseFloat(a.version || '1.0'))
+                            .map(form => (
+                              <MenuItem key={form.id} value={form.version || '1.0'}>
+                                v{form.version || '1.0'} {form.isLatest && '(Atual)'}
+                              </MenuItem>
+                            ))}
+                        </Select>
+                      </FormControl>
+
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={formData.useLatestVersion || false}
+                            onChange={(e) => setFormData({ ...formData, useLatestVersion: e.target.checked })}
+                          />
+                        }
+                        label="Sempre usar versão mais recente"
+                        sx={{ mb: 2 }}
+                      />
+                    </>
                   )}
+
                   <Typography variant="caption" color="primary" sx={{ mt: 0.5, display: 'block' }}>
                     💡 Este menu abrirá diretamente o formulário selecionado
                   </Typography>
-                </FormControl>
+                </>
               ) : (
                 <TextField
                   margin="dense"

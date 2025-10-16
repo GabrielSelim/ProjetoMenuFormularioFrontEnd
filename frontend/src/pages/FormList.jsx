@@ -16,7 +16,11 @@ import {
   Alert,
   Container,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import {
   Add,
@@ -24,7 +28,8 @@ import {
   Delete,
   Visibility,
   Search,
-  Description
+  Description,
+  History
 } from '@mui/icons-material';
 import { formService } from '../api/formService';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +44,7 @@ const FormList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [previewForm, setPreviewForm] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [selectedVersions, setSelectedVersions] = useState({});
   const navigate = useNavigate();
 
   // Função para contar campos (suporta FormEngine e formulários tradicionais)
@@ -87,7 +93,6 @@ const FormList = () => {
       setError('');
       const formsData = await formService.getForms();
       
-      // Processa os formulários para incluir schema parseado
       const processedForms = (formsData || []).map(form => {
         let processedForm = { ...form };
         if (form.schemaJson && typeof form.schemaJson === 'string') {
@@ -103,13 +108,70 @@ const FormList = () => {
         return processedForm;
       });
       
-      setForms(processedForms);
+      const groupedForms = groupFormsByName(processedForms);
+      setForms(groupedForms);
+      
+      const initialVersions = {};
+      groupedForms.forEach(formGroup => {
+        const groupKey = `${formGroup.name}_${formGroup.originalFormId}`;
+        initialVersions[groupKey] = formGroup.latestVersion;
+      });
+      setSelectedVersions(initialVersions);
+      
     } catch (err) {
       console.error('Erro ao carregar formulários:', err);
       setError(err.message || 'Erro ao carregar formulários');
     } finally {
       setLoading(false);
     }
+  };
+
+  const groupFormsByName = (forms) => {
+    const grouped = {};
+    
+    forms.forEach(form => {
+      const originalId = form.originalFormId || form.id;
+      const groupKey = `${form.name}_${originalId}`;
+      
+      if (!grouped[groupKey]) {
+        grouped[groupKey] = {
+          name: form.name,
+          originalFormId: originalId,
+          versions: [],
+          latestVersion: form.version || '1.0',
+          id: form.id
+        };
+      }
+      grouped[groupKey].versions.push(form);
+      
+      if (form.isLatest) {
+        grouped[groupKey].latestVersion = form.version || '1.0';
+        grouped[groupKey].id = form.id;
+      }
+    });
+    
+    return Object.values(grouped).map(group => ({
+      ...group,
+      versions: group.versions.sort((a, b) => {
+        const versionA = parseFloat((a.version || '1.0').replace('v', ''));
+        const versionB = parseFloat((b.version || '1.0').replace('v', ''));
+        return versionA - versionB;
+      })
+    }));
+  };
+
+  const getSelectedForm = (formGroup) => {
+    const groupKey = `${formGroup.name}_${formGroup.originalFormId}`;
+    const selectedVersion = selectedVersions[groupKey] || formGroup.latestVersion;
+    return formGroup.versions.find(v => v.version === selectedVersion) || formGroup.versions[formGroup.versions.length - 1];
+  };
+
+  const handleVersionChange = (formGroup, version) => {
+    const groupKey = `${formGroup.name}_${formGroup.originalFormId}`;
+    setSelectedVersions(prev => ({
+      ...prev,
+      [groupKey]: version
+    }));
   };
 
   const handleDelete = async (formId) => {
@@ -235,91 +297,118 @@ const FormList = () => {
             </Box>
           ) : (
             <Grid container spacing={3}>
-              {filteredForms.map((form) => (
-                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={form.id}>
-                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography variant="h6" component="h2" gutterBottom>
-                        {form.name}
-                      </Typography>
-                      
-                      {form.description && (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            mb: 2,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                          }}
-                        >
-                          {form.description}
-                        </Typography>
-                      )}
-                      
-                      <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
-                        <Chip
-                          label={`${getFormFieldsCount(form)} campos`}
-                          size="small"
-                          variant="outlined"
-                        />
-                        {form.createdAt && (
+              {filteredForms.map((formGroup) => {
+                const selectedForm = getSelectedForm(formGroup);
+                return (
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={formGroup.name}>
+                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                          <Typography variant="h6" component="h2" sx={{ flexGrow: 1 }}>
+                            {formGroup.name}
+                          </Typography>
                           <Chip
-                            label={new Date(form.createdAt).toLocaleDateString()}
+                            icon={<History />}
+                            label={`${formGroup.versions.length} versões`}
+                            size="small"
+                            variant="outlined"
+                            color="primary"
+                          />
+                        </Box>
+
+                        <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+                          <InputLabel>Versão</InputLabel>
+                          <Select
+                            value={selectedVersions[`${formGroup.name}_${formGroup.originalFormId}`] || formGroup.latestVersion}
+                            label="Versão"
+                            onChange={(e) => handleVersionChange(formGroup, e.target.value)}
+                          >
+                            {formGroup.versions.map((version) => (
+                              <MenuItem key={version.id} value={version.version}>
+                                v{version.version} {version.version === formGroup.latestVersion && '(Atual)'}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        
+                        {selectedForm.description && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              mb: 2,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: 'vertical',
+                            }}
+                          >
+                            {selectedForm.description}
+                          </Typography>
+                        )}
+                        
+                        <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
+                          <Chip
+                            label={`${getFormFieldsCount(selectedForm)} campos`}
                             size="small"
                             variant="outlined"
                           />
+                          {selectedForm.createdAt && (
+                            <Chip
+                              label={new Date(selectedForm.createdAt).toLocaleDateString()}
+                              size="small"
+                              variant="outlined"
+                            />
+                          )}
+                        </Box>
+                        
+                        {selectedForm.schema?.title && (
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Título:</strong> {selectedForm.schema.title}
+                          </Typography>
                         )}
-                      </Box>
+                      </CardContent>
                       
-                      {form.schema?.title && (
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Título:</strong> {form.schema.title}
-                        </Typography>
-                      )}
-                    </CardContent>
-                    
-                    <CardActions sx={{ p: 2, pt: 0 }}>
-                      <Button
-                        size="small"
-                        startIcon={<Visibility />}
-                        onClick={() => handleView(form.id)}
-                        variant="contained"
-                        color="primary"
-                      >
-                        Abrir Formulário
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<Search />}
-                        onClick={() => handlePreview(form)}
-                        variant="outlined"
-                      >
-                        Preview
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<Edit />}
-                        onClick={() => handleEdit(form.id)}
-                        variant="outlined"
-                      >
-                        Editar
-                      </Button>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDelete(form.id)}
-                        color="error"
-                        sx={{ ml: 'auto' }}
-                      >
-                        <Delete />
-                      </IconButton>
+                      <CardActions sx={{ p: 2, pt: 0 }}>
+                        <Button
+                          size="small"
+                          startIcon={<Visibility />}
+                          onClick={() => handleView(selectedForm.id)}
+                          variant="contained"
+                          color="primary"
+                        >
+                          Abrir Formulário
+                        </Button>
+                        <Button
+                          size="small"
+                          startIcon={<Search />}
+                          onClick={() => handlePreview(selectedForm)}
+                          variant="outlined"
+                        >
+                          Preview
+                        </Button>
+                        <Button
+                          size="small"
+                          startIcon={<Edit />}
+                          onClick={() => handleEdit(selectedForm.id)}
+                          variant="outlined"
+                        >
+                          Editar
+                        </Button>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(selectedForm.id)}
+                          color="error"
+                          sx={{ ml: 'auto' }}
+                        >
+                          <Delete />
+                        </IconButton>
                     </CardActions>
-                  </Card>
-                </Grid>
-              ))}
+                    </Card>
+                  </Grid>
+                );
+              })}
             </Grid>
           )}
 

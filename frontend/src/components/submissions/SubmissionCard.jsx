@@ -11,7 +11,8 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Tooltip
+  Tooltip,
+  Chip
 } from '@mui/material';
 import {
   Visibility,
@@ -112,14 +113,26 @@ const SubmissionCard = ({
       <CardContent sx={{ flexGrow: 1, pb: 1 }}>
         {/* Header com Status */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Typography variant="h6" component="h3" sx={{ 
-            flexGrow: 1, 
-            mr: 2, 
-            fontSize: { xs: '1.125rem', md: '1rem' },
-            lineHeight: 1.3
-          }}>
-            {submission.formName}
-          </Typography>
+          <Box sx={{ flexGrow: 1, mr: 2 }}>
+            <Typography variant="h6" component="h3" sx={{ 
+              fontSize: { xs: '1.125rem', md: '1rem' },
+              lineHeight: 1.3,
+              mb: 0.5
+            }}>
+              {submission.formName}
+            </Typography>
+            <Chip 
+              label={`Formulário v${submission.formVersion || '1.0'}`}
+              size="small"
+              color="primary"
+              variant="outlined"
+              sx={{ 
+                fontSize: '0.65rem',
+                height: 18,
+                '& .MuiChip-label': { px: 1 }
+              }}
+            />
+          </Box>
           <SubmissionStatus status={submission.status} />
         </Box>
 

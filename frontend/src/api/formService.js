@@ -51,6 +51,36 @@ export const formService = {
     }
   },
 
+  // Busca todas as versões de um formulário
+  getFormVersions: async (originalFormId) => {
+    try {
+      const response = await api.get(`/Forms/${originalFormId}/versions`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Erro ao buscar versões do formulário' };
+    }
+  },
+
+  // Busca a versão mais recente de um formulário
+  getLatestVersion: async (originalFormId) => {
+    try {
+      const response = await api.get(`/Forms/${originalFormId}/latest`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Erro ao buscar versão mais recente' };
+    }
+  },
+
+  // Busca uma versão específica de um formulário
+  getFormByVersion: async (originalFormId, version) => {
+    try {
+      const response = await api.get(`/Forms/${originalFormId}/version/${version}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Erro ao buscar versão específica' };
+    }
+  },
+
   // Deleta um formulário
   deleteForm: async (id) => {
     try {
