@@ -1,13 +1,26 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { rSuiteComponents } from '@react-form-builder/components-rsuite';
+import { 
+  rSuiteComponents,
+  formEngineRsuiteCssLoader,
+  ltrCssLoader,
+  rtlCssLoader,
+  RsLocalizationWrapper
+} from '@react-form-builder/components-rsuite';
 import { BuilderView, FormBuilder } from '@react-form-builder/designer';
+import { BiDi } from '@react-form-builder/core';
+import './FormEngineComponentRegistry';
 import 'rsuite/dist/rsuite.min.css';
+import '../mobx-config';
 
-// Versão que mantém track do estado do formulário internamente
-const componentsMetadata = rSuiteComponents.map(definer => definer.build());
-const builderView = new BuilderView(componentsMetadata);
+const componentsMetadata = rSuiteComponents.map(definer => {
+  const built = definer.build();
+  return built;
+}).filter(component => component && (component.type || component.model));
+const builderView = new BuilderView(componentsMetadata)
+  .withCssLoader(BiDi.LTR, ltrCssLoader)
+  .withCssLoader(BiDi.RTL, rtlCssLoader)
+  .withCssLoader('common', formEngineRsuiteCssLoader);
 
-// Formulário inicial
 const emptyForm = {
   "version": "1",
   "tooltipType": "RsTooltip",
@@ -59,7 +72,6 @@ const createGetFormFn = (initialFormData) => {
 const FormBuilderAlternative = React.forwardRef(({ initialForm }, ref) => {
   const builderRef = useRef();
 
-  // Log para debug quando initialForm mudar
   React.useEffect(() => {
   }, [initialForm]);
 
@@ -67,14 +79,12 @@ const FormBuilderAlternative = React.forwardRef(({ initialForm }, ref) => {
     if (builder) {
       builderRef.current = builder;
       
-      // Não usar captura periódica para evitar conflitos
     }
   }, []);
 
   React.useImperativeHandle(ref, () => ({
     getCurrentForm: () => {
       
-      // Tentar obter sempre do builderRef atual
       if (builderRef.current) {
         try {
           const formData = builderRef.current.formAsString;
@@ -100,6 +110,9 @@ const FormBuilderAlternative = React.forwardRef(({ initialForm }, ref) => {
 
   const getFormFn = React.useMemo(() => createGetFormFn(initialForm), [initialForm]);
 
+  const customValidators = {};
+  const customActions = {};
+
   return (
     <div style={{ height: '100%', width: '100%', minHeight: '600px' }}>
       <FormBuilder
@@ -108,6 +121,8 @@ const FormBuilderAlternative = React.forwardRef(({ initialForm }, ref) => {
         getForm={getFormFn}
         formName="test"
         builderRef={setBuilderRef}
+        validators={customValidators}
+        actions={customActions}
       />
     </div>
   );

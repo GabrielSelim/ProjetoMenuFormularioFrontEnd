@@ -77,7 +77,6 @@ const Dashboard = () => {
         loading: false
       });
     } catch (err) {
-      console.error('Erro ao carregar dados do dashboard:', err);
       setDashboardData(prev => ({ ...prev, loading: false }));
     }
   };

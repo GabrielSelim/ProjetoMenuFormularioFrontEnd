@@ -4,17 +4,14 @@ div[style*="rgba(114, 199, 255, 0.816)"] {
   display: none !important;
 }
 
-/* Remover elementos com z-index 1000 e fundo azul específico */
 div[style*="z-index: 1000"][style*="rgba(114, 199, 255"] {
   display: none !important;
 }
 
-/* Remover notificações flutuantes azuis */
 div[style*="display: flex"][style*="flex-direction: column"][style*="rgba(114, 199, 255"] {
   display: none !important;
 }
 
-/* Alternativa mais específica */
 div[style*="border-radius: 6px"][style*="padding: 1em"][style*="gap: 0.75em"][style*="rgba(114, 199, 255"] {
   display: none !important;
 }

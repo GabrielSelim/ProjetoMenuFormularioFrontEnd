@@ -7,11 +7,15 @@ import {
   rtlCssLoader
 } from '@react-form-builder/components-rsuite';
 import { ActionDefinition, BiDi, createView, FormViewer } from '@react-form-builder/core';
+import './FormEngineComponentRegistry';
 import 'rsuite/dist/rsuite.min.css';
 import '../mobx-config';
 
-// Configuração do viewer seguindo a documentação
-const componentsMetadata = rSuiteComponents.map(definer => definer.build().model);
+const componentsMetadata = rSuiteComponents.map(definer => {
+  const built = definer.build();
+  const metadata = built.model || built;
+  return metadata;
+}).filter(component => component && component.type);
 
 const view = createView(componentsMetadata)
   .withViewerWrapper(RsLocalizationWrapper)
@@ -19,7 +23,6 @@ const view = createView(componentsMetadata)
   .withCssLoader(BiDi.RTL, rtlCssLoader)
   .withCssLoader('common', formEngineRsuiteCssLoader);
 
-// Custom validators simplificados
 const customValidators = {};
 
 const FormViewerSimple = ({ form, formName = 'Preview' }) => {
@@ -40,10 +43,12 @@ const FormViewerSimple = ({ form, formName = 'Preview' }) => {
   const handleFormDataChange = useCallback(({ data, errors }) => {
   }, []);
 
+  const handleError = useCallback((error) => {
+  }, []);
+
   const getFormFn = useCallback(async (name) => {
     
     if (name === formName && form) {
-      // O FormViewer também precisa de uma string JSON completa
       const fullForm = {
         "version": "1",
         "tooltipType": "RsTooltip",
@@ -79,10 +84,10 @@ const FormViewerSimple = ({ form, formName = 'Preview' }) => {
         initialData={{}}
         localize={localizeFn}
         onFormDataChange={handleFormDataChange}
+        onError={handleError}
         viewerRef={setRef}
         validators={customValidators}
-        actions={{
-        }}
+        actions={{}}
       />
     </div>
   );

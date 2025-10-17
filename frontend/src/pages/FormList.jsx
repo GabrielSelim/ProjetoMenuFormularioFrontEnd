@@ -99,7 +99,6 @@ const FormList = () => {
           try {
             processedForm.schema = JSON.parse(form.schemaJson);
           } catch (parseError) {
-            console.warn('Erro ao parsear schema do formulário', form.id, parseError);
             processedForm.schema = null;
           }
         } else if (form.schemaJson && typeof form.schemaJson === 'object') {
@@ -119,7 +118,6 @@ const FormList = () => {
       setSelectedVersions(initialVersions);
       
     } catch (err) {
-      console.error('Erro ao carregar formulários:', err);
       setError(err.message || 'Erro ao carregar formulários');
     } finally {
       setLoading(false);
@@ -195,7 +193,6 @@ const FormList = () => {
         try {
           processedForm.schema = JSON.parse(formData.schemaJson);
         } catch (parseError) {
-          console.error('Erro ao parsear schema para preview:', parseError);
           processedForm.schema = null;
         }
       } else if (formData.schemaJson && typeof formData.schemaJson === 'object') {
@@ -205,7 +202,6 @@ const FormList = () => {
       setPreviewForm(processedForm);
       setPreviewOpen(true);
     } catch (err) {
-      console.error('Erro ao carregar formulário para preview:', err);
       setError(err.message || 'Erro ao carregar formulário para preview');
     }
   };

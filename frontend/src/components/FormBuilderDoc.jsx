@@ -9,7 +9,6 @@ import {
 import { ActionDefinition, BiDi } from '@react-form-builder/core';
 import { BuilderView, FormBuilder } from '@react-form-builder/designer';
 
-// Configuração EXATA da documentação
 const componentsMetadata = rSuiteComponents.map(definer => definer.build());
 const builderView = new BuilderView(componentsMetadata)
   .withTemplates([])
@@ -20,7 +19,6 @@ const builderView = new BuilderView(componentsMetadata)
 
 const formStorage = undefined;
 
-// Validators da documentação
 const customValidators = {
   'string': {
     'isHex': {
@@ -51,7 +49,6 @@ const customValidators = {
   }
 };
 
-// Formulário EXATO da documentação
 const emptyForm = {
   "version": "1",
   "tooltipType": "RsTooltip",

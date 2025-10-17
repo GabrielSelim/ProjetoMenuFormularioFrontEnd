@@ -73,7 +73,6 @@ const MenuManager = () => {
         await loadAllMenus();
         await loadAvailableForms();
       } catch (err) {
-        console.error('❌ Erro ao inicializar MenuManager:', err);
         setError('Erro ao carregar dados iniciais');
       }
     };
@@ -87,7 +86,6 @@ const MenuManager = () => {
       const forms = await formService.getForms();
       setAvailableForms(forms || []);
     } catch (err) {
-      console.warn('Erro ao carregar formulários para menus:', err);
       setAvailableForms([]);
     } finally {
       setLoadingForms(false);
@@ -290,7 +288,6 @@ const MenuManager = () => {
       await loadAllMenus();
       
     } catch (err) {
-      console.error('❌ Erro ao reordenar menus:', err);
       setError(err.message || 'Erro ao reordenar menus');
       
       // Em caso de erro, recarrega os menus para restaurar a ordem original

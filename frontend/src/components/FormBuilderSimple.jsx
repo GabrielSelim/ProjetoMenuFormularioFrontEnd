@@ -11,7 +11,6 @@ import { BiDi } from '@react-form-builder/core';
 import 'rsuite/dist/rsuite.min.css';
 import '../mobx-config';
 
-// Configuração seguindo exatamente a documentação
 const componentsMetadata = rSuiteComponents.map(definer => definer.build());
 const builderView = new BuilderView(componentsMetadata)
   .withTemplates([])
@@ -21,7 +20,6 @@ const builderView = new BuilderView(componentsMetadata)
   .withCssLoader('common', formEngineRsuiteCssLoader);
 
 const FormBuilderSimple = ({ onFormChange }) => {
-  // Formulário inicial seguindo exatamente a documentação
   const [currentForm, setCurrentForm] = React.useState(() => ({
     "version": "1",
     "tooltipType": "RsTooltip",
@@ -45,7 +43,6 @@ const FormBuilderSimple = ({ onFormChange }) => {
     "defaultLanguage": "pt-BR"
   }));
 
-  // A função getForm deve ser assíncrona conforme a documentação
   const getFormFn = useCallback(async (name) => {
     return currentForm;
   }, [currentForm]);

@@ -54,7 +54,6 @@ const SubmissionFilters = ({
           spacing={2} 
           sx={{ flexGrow: 1, width: '100%' }}
         >
-          {/* Filtro por Formulário */}
           <FormControl sx={{ minWidth: 200 }}>
             <InputLabel>Formulário</InputLabel>
             <Select
@@ -71,7 +70,6 @@ const SubmissionFilters = ({
             </Select>
           </FormControl>
 
-          {/* Filtro por Status */}
           <FormControl sx={{ minWidth: 150 }}>
             <InputLabel>Status</InputLabel>
             <Select
@@ -88,7 +86,6 @@ const SubmissionFilters = ({
             </Select>
           </FormControl>
 
-          {/* Busca */}
           <TextField
             label="Buscar"
             placeholder="Nome do formulário, usuário..."
@@ -97,7 +94,6 @@ const SubmissionFilters = ({
             sx={{ flexGrow: 1, minWidth: 200 }}
           />
 
-          {/* Data Inicial */}
           <TextField
             type="date"
             label="Data Inicial"
@@ -107,7 +103,6 @@ const SubmissionFilters = ({
             sx={{ minWidth: 150 }}
           />
 
-          {/* Data Final */}
           <TextField
             type="date"
             label="Data Final"
@@ -118,7 +113,6 @@ const SubmissionFilters = ({
           />
         </Stack>
 
-        {/* Botão Limpar Filtros */}
         <Button
           variant="outlined"
           startIcon={<Clear />}

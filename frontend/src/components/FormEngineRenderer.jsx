@@ -14,11 +14,9 @@ import '../styles/formengine-custom.css';
 const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialData = {}, data = {}, onChange, readOnly = false }) => {
   
   const [formData, setFormData] = useState(() => {
-    // Prioriza data, depois initialData, depois objeto vazio
     return { ...initialData, ...data };
   });
 
-  // Verifica se é um schema do FormEngine.io (mais flexível)
   const isFormEngineSchema = formSchema && 
     formSchema.formEngineSchema && (
       formSchema.formEngineSchema.form ||
@@ -28,19 +26,16 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
       formSchema.formEngineSchema.type
     );
 
-  // Se não for schema do FormEngine, retorna null para usar o renderer padrão
   if (!isFormEngineSchema) {
     return null;
   }
 
-  // Criar um renderer personalizado baseado no schema do FormEngine
   const handleFormSubmit = () => {
     if (onSubmit) {
       onSubmit(formData);
     }
   };
 
-  // Função para extrair valores das props que podem vir como {value: "texto"} ou "texto"
   const extractValue = (prop) => {
     if (!prop) return '';
     if (typeof prop === 'string') return prop;
@@ -55,7 +50,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
     };
     setFormData(newData);
     
-    // Chama onChange se fornecido (para o auto-save)
     if (onChange) {
       onChange(newData);
     }
@@ -330,11 +324,9 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
     }
   };
 
-  // Função para extrair a estrutura do formulário de diferentes formatos de schema
   const getFormStructure = () => {
     const schema = formSchema.formEngineSchema;
     
-    // Diferentes possíveis estruturas
     if (schema.form) {
       return schema.form;
     } else if (schema.components) {
@@ -350,7 +342,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
 
   const formStructure = getFormStructure();
   
-  // Contar total de componentes (incluindo aninhados)
   const countComponents = (structure) => {
     if (!structure) return 0;
     if (structure.children && Array.isArray(structure.children)) {
@@ -391,7 +382,6 @@ const FormEngineRenderer = ({ formSchema, onSubmit, title, description, initialD
         bgcolor: 'background.paper'
       }}>
         
-        {/* Renderizar baseado na estrutura do formulário */}
         {formStructure.children && Array.isArray(formStructure.children) ? (
           formStructure.children.map(component => renderFormComponent(component))
         ) : formStructure.type ? (

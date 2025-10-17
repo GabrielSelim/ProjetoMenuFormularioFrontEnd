@@ -6,7 +6,6 @@ import { Box, CircularProgress } from '@mui/material';
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { user, loading, isAuthenticated, hasRole } = useAuth();
 
-  // Mostra loading enquanto verifica autenticação
   if (loading) {
     return (
       <Box 
@@ -21,12 +20,10 @@ const ProtectedRoute = ({ children, roles = [] }) => {
     );
   }
 
-  // Redireciona para login se não estiver autenticado
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
-  // Verifica se o usuário tem o role necessário
   if (roles.length > 0 && !hasRole(roles)) {
     return <Navigate to="/access-denied" replace />;
   }

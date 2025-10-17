@@ -1,4 +1,3 @@
-// Script para verificar componentes disponíveis
 import { rSuiteComponents } from '@react-form-builder/components-rsuite';
 
 console.log('=== Componentes RSuite Disponíveis ===');

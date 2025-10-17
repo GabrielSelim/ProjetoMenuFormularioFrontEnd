@@ -4,11 +4,9 @@ import { BuilderView, FormBuilder } from '@react-form-builder/designer';
 import 'rsuite/dist/rsuite.min.css';
 import '../mobx-config';
 
-// Configuração mais simples para teste
 const componentsMetadata = rSuiteComponents.map(definer => definer.build());
 const builderView = new BuilderView(componentsMetadata);
 
-// Formulário inicial seguindo exatamente a documentação
 const initialForm = {
   "version": "1",
   "tooltipType": "RsTooltip",
@@ -33,12 +31,10 @@ const initialForm = {
 const FormBuilderMinimal = ({ onFormChange }) => {
   const [formData, setFormData] = useState(initialForm);
 
-  // Função getForm assíncrona - deve retornar STRING JSON
   const getFormFn = useCallback(async (name) => {
     return JSON.stringify(formData);
   }, [formData]);
 
-  // Handler para mudanças no formulário
   const handleFormChange = useCallback((newFormData) => {
     if (newFormData) {
       setFormData(newFormData);

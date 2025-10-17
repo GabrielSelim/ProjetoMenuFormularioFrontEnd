@@ -150,7 +150,6 @@ const FormBuilderAdvanced = () => {
       }
       
     } catch (err) {
-      console.error('Erro ao carregar formulário para edição:', err);
       setError(err.message || 'Erro ao carregar formulário');
     } finally {
       setLoading(false);

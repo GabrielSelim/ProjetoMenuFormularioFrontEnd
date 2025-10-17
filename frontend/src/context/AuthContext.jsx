@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Verifica se há um usuário logado ao inicializar
   useEffect(() => {
     const initializeAuth = () => {
       try {

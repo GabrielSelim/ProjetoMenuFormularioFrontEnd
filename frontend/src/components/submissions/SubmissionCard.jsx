@@ -136,14 +136,12 @@ const SubmissionCard = ({
           <SubmissionStatus status={submission.status} />
         </Box>
 
-        {/* Layout responsivo das informações */}
         <Box sx={{ 
           display: 'grid',
           gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
           gap: { xs: 1, md: 2 },
           mb: 1
         }}>
-          {/* Coluna 1 */}
           <Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
               <strong>ID:</strong> {submission.id}
@@ -158,7 +156,6 @@ const SubmissionCard = ({
             </Typography>
           </Box>
 
-          {/* Coluna 2 */}
           <Box>
             {submission.dataSubmissao && (
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
@@ -192,7 +189,6 @@ const SubmissionCard = ({
         pb: 1,
         minHeight: { xs: 'auto', md: 48 }
       }}>
-        {/* Ações Principais */}
         <Box sx={{ display: 'flex', gap: 0.5 }}>
           <Tooltip title="Visualizar">
             <IconButton 

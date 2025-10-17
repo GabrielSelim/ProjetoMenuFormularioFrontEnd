@@ -18,7 +18,6 @@ export const MenuProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  // Carrega menus baseado no role do usuário
   const loadMenus = async () => {
     if (!user || !user.role) {
       setMenus([]);
@@ -35,14 +34,11 @@ export const MenuProvider = ({ children }) => {
         setMenus(menusData);
       } else {
         setMenus([]);
-        console.warn('⚠️ Dados de menus por role inválidos:', menusData);
       }
     } catch (err) {
       const errorMessage = err.message || 'Erro ao carregar menus';
       setError(errorMessage);
-      console.error('❌ Erro ao carregar menus por role:', err);
       
-      // Em caso de erro, mantém menus vazios mas não quebra a aplicação
       setMenus([]);
     } finally {
       setLoading(false);
@@ -61,15 +57,11 @@ export const MenuProvider = ({ children }) => {
         setMenus(menusData);
       } else {
         setMenus([]);
-        console.warn('⚠️ Dados de menus inválidos:', menusData);
       }
     } catch (err) {
       const errorMessage = err.message || 'Erro ao carregar menus';
       setError(errorMessage);
-      console.error('❌ Erro ao carregar menus:', err);
       
-      // Não limpa os menus em caso de erro para evitar tela branca
-      // setMenus([]);
     } finally {
       setLoading(false);
     }
@@ -113,14 +105,11 @@ export const MenuProvider = ({ children }) => {
   const reorderMenus = async (reorderedMenus) => {
     try {
       
-      // Atualiza otimisticamente a UI primeiro
       setMenus(reorderedMenus);
       
-      // Envia para o servidor
       await menuService.reorderMenus(reorderedMenus);
       
     } catch (err) {
-      console.error('❌ Erro na reordenação:', err);
       throw err;
     }
   };
